@@ -1,21 +1,17 @@
 #include <SFML/Graphics.hpp>
+#include "interface.h"
 
 const int windowHeight {800};
 const int windowWidth {800};
 
 
-
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "Chess", sf::Style::Close);
-    sf::Texture chessboard;
-    if (!chessboard.loadFromFile("textures/chessboard.png"))
-    {
-        return 1;
-    }
+    GameGraphics ui;
+    ui.loadInterfaceTextures();
+    ui.setTexture();
 
-    sf::Sprite board;
-    board.setTexture(chessboard);
+    sf::RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "Chess", sf::Style::Close);
 
     while (window.isOpen())
     {
@@ -27,7 +23,8 @@ int main()
         }
 
         window.clear();
-        window.draw(board);
+        window.draw(ui.chessboard);
+        window.draw(ui.blackRook);
         window.display();
     }
 
