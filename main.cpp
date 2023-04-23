@@ -7,15 +7,15 @@ const int windowWidth {800};
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "SFML works!");
-    sf::Texture chessBoard;
-    if (!chessBoard.loadFromFile("textures/chessBoard.png"))
+    sf::RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "Chess", sf::Style::Close);
+    sf::Texture chessboard;
+    if (!chessboard.loadFromFile("textures/chessboard.png"))
     {
         return 1;
     }
 
     sf::Sprite board;
-    board.setTexture(chessBoard);
+    board.setTexture(chessboard);
 
     while (window.isOpen())
     {
