@@ -9,7 +9,7 @@ int main()
 {
     sf::RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "SFML works!");
     sf::Texture chessBoard;
-    if (!chessBoard.loadFromFile("textures/chessboard.png"))
+    if (!chessBoard.loadFromFile("textures/chessBoard.png"))
     {
         return 1;
     }
