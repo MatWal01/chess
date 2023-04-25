@@ -1,4 +1,6 @@
 #include <SFML/Graphics.hpp>
+#include <vector>
+#include <string>
 #ifndef _INTERFACE_H_
 #define _INTERFACE_H_
 
@@ -44,8 +46,28 @@ public:
     sf::Sprite blackQueen;
     sf::Sprite blackKing;
 
-    bool loadInterfaceTextures();
+    bool loadGameTextures();
     void setTexture();
+};
+
+class Position
+{
+private:
+    char onMove;
+
+    // castle rights
+    bool wKCastle;
+    bool wQCastle;
+    bool bKCastle;
+    bool bQCastle;
+    
+    std::vector<std::vector<char>> pieces;
+public:
+    std::string returnFEN();
+    std::vector<std::vector<char>> setPosition(std::string FEN);
+    Position(std::string FEN);
+    Position();
+    Position(Position* prev, std::string move);
 };
 
 #endif
