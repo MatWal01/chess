@@ -182,7 +182,7 @@ GameGraphics::GameGraphics()
 
 char Position::getPiece(int row, int column)
 {
-    return pieces.at(row).at(column);
+    return pieces.at(column).at(row);
 }
 
 

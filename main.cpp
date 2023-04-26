@@ -32,7 +32,7 @@ int main()
         {
             for (size_t j {0}; j < 8; j++)
             {
-                char temp = curr.getPiece(j, i);
+                char temp = curr.getPiece(i, j);
                 if (temp == '\0')
                 {
                     continue;
