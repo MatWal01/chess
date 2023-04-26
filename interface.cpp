@@ -197,39 +197,36 @@ void Position::setPosition(std::string FEN)
     }
 
     int charCounter {0};
-    while (charCounter < FEN.size())
-    {
-        for (int i {7}; FEN.at(charCounter) != ' ' && i >= 0; i--, charCounter++)
-        {
-            for (size_t j {0}; FEN.at(charCounter) != '/' && j < 8; j++)
-            {
-                char s = FEN.at(charCounter);
-                // check if char is a number 1-8
-                if (s - '0' > 0 && s - '0' < 9)
-                {
-                    s = '0';
-                }
 
-                switch (s)
-                {
-                    case '0': // if char is a digit
-                        for (size_t k {0}; k < FEN.at(charCounter) - '0'; k++, j++)
-                        {
-                            pieces.at(i).at(j) = 0;
-                        }
-                        charCounter++;
-                        break;
-                    case '/':
-                        j = 8;
-                        break;
-                    default:
-                        pieces.at(i).at(j) = s;
-                        charCounter++;
-                        break;
-                }
-            }
+    int i {7};
+    int j {0};
+    char temp;
+    while (FEN.at(charCounter) != ' ')
+    {
+        temp = FEN.at(charCounter);
+        if (temp - '0' > 0 && temp - '0' < 9)
+        {
+            temp = '0';
         }
-        break;                
+        switch (temp)
+        {
+            case '/':
+                i--;
+                j = 0;
+                break;
+            case '0':
+                for (int k {0}; k < FEN.at(charCounter) - '0'; k++)
+                {
+                    pieces.at(i).at(j) = '\0';
+                    j++;
+                }
+                break;
+            default:
+                pieces.at(i).at(j) = temp;
+                j++;
+        }
+        charCounter++;
+
     }
 
     return;
