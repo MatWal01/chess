@@ -4,6 +4,7 @@
 #ifndef _INTERFACE_H_
 #define _INTERFACE_H_
 
+
 class GameGraphics
 {
 private:
@@ -46,28 +47,45 @@ public:
     sf::Sprite blackQueen;
     sf::Sprite blackKing;
 
+    // size of chessboard and piece rectangles
+    float chessboardSize;
+    float pieceSize; // should always be 1/8 of chessboard;
+
+    sf::Sprite returnSprite(char piece);
     bool loadGameTextures();
     void setTexture();
+    void setScale();
+    GameGraphics();
 };
+
+
+struct castleRights
+{
+    bool wKingside {true};
+    bool wQueenside {true};
+    bool bKingside {true};
+    bool bQueenside {true};
+
+};
+
 
 class Position
 {
 private:
     char onMove;
 
-    // castle rights
-    bool wKCastle;
-    bool wQCastle;
-    bool bKCastle;
-    bool bQCastle;
-    
+    // castle rights kingside and queenside
+    castleRights castleRights;
     std::vector<std::vector<char>> pieces;
+
 public:
+    char getPiece(int row, int column);
     std::string returnFEN();
-    std::vector<std::vector<char>> setPosition(std::string FEN);
+    void setPosition(std::string FEN);
     Position(std::string FEN);
     Position();
     Position(Position* prev, std::string move);
 };
+
 
 #endif

@@ -1,4 +1,48 @@
+#include <iostream>
 #include "interface.h"
+
+// ???
+sf::Sprite GameGraphics::returnSprite(char piece)
+{
+    switch (piece)
+    {        
+        // white pieces
+        case 'P':
+            return whitePawn;
+        case 'R':
+            return whiteRook;
+        case 'N':
+            return whiteKnight;
+        case 'B':
+            return whiteBishop;
+        case 'Q':
+            return whiteQueen;
+        case 'K':
+            return whiteKing;
+        
+        // black pieces
+        case 'p':
+            return blackPawn;
+        case 'r':
+            return blackRook;
+        case 'n':
+            return blackKnight;
+        case 'b':
+            return blackBishop;
+        case 'q':
+            return blackQueen;
+        case 'k':
+            return blackKing;
+        
+        // no piece
+        case '\0':  // should be unreachable
+            return whiteKing;
+        default:
+            return blackKing;
+
+    }
+}
+
 
 bool GameGraphics::loadGameTextures()
 {
@@ -61,8 +105,24 @@ bool GameGraphics::loadGameTextures()
     return true;
 }
 
+
 void GameGraphics::setTexture()
 {
+
+    whitePawnTexture.setSmooth(true);
+    whiteRookTexture.setSmooth(true);
+    whiteKnightTexture.setSmooth(true);
+    whiteBishopTexture.setSmooth(true);
+    whiteQueenTexture.setSmooth(true);
+    whiteKingTexture.setSmooth(true);
+    
+    blackPawnTexture.setSmooth(true);
+    blackRookTexture.setSmooth(true);
+    blackKnightTexture.setSmooth(true);
+    blackBishopTexture.setSmooth(true);
+    blackQueenTexture.setSmooth(true);
+    blackKingTexture.setSmooth(true);
+
     chessboard.setTexture(chessboardTexture);
 
     whitePawn.setTexture(whitePawnTexture);
@@ -72,7 +132,6 @@ void GameGraphics::setTexture()
     whiteQueen.setTexture(whiteQueenTexture);
     whiteKing.setTexture(whiteKingTexture);
     
-    blackRookTexture.setSmooth(true);
     blackPawn.setTexture(blackPawnTexture);
     blackRook.setTexture(blackRookTexture);
     blackKnight.setTexture(blackKnightTexture);
@@ -82,10 +141,54 @@ void GameGraphics::setTexture()
 }
 
 
-// TODO: change this function to void
-std::vector<std::vector<char>> Position::setPosition(std::string FEN)
+void GameGraphics::setScale()
 {
-    std::vector<std::vector<char>> pieces;
+    sf::FloatRect board = chessboard.getGlobalBounds();
+    // I assume all pieces files have the same resolution and are squares
+    sf::FloatRect piece = blackRook.getGlobalBounds();
+    chessboardSize = board.width;
+    float scale = (board.width / 8.0) / piece.width;
+    // hopefully all pieces are the same
+    pieceSize = piece.width * scale;
+
+    whitePawn.setScale(scale, scale);
+    whiteRook.setScale(scale, scale);
+    whiteKnight.setScale(scale, scale);
+    whiteBishop.setScale(scale, scale);
+    whiteQueen.setScale(scale, scale);
+    whiteKing.setScale(scale, scale);
+    
+    blackPawn.setScale(scale, scale);
+    blackRook.setScale(scale, scale);
+    blackKnight.setScale(scale, scale);
+    blackBishop.setScale(scale, scale);
+    blackQueen.setScale(scale, scale);
+    blackKing.setScale(scale, scale);
+}
+
+
+GameGraphics::GameGraphics()
+{
+    if (!loadGameTextures())
+    {
+        std::cout << "Unable to load textures" << std::endl;
+        return;
+    }
+    setTexture();
+    setScale();
+    return;
+}
+
+
+char Position::getPiece(int row, int column)
+{
+    return pieces.at(row).at(column);
+}
+
+
+// sets a position 2D vector of chars from FEN
+void Position::setPosition(std::string FEN)
+{
     // turn pieces vector to 8x8 size
     pieces.resize(8);
     for (size_t i {0}; i < 8; i++)
@@ -129,14 +232,16 @@ std::vector<std::vector<char>> Position::setPosition(std::string FEN)
         break;                
     }
 
-    return pieces;
+    return;
 }
+
 
 Position::Position(std::string FEN)
 {
     // TODO: change setPosition fn and change 
-    pieces = setPosition(FEN);
+    setPosition(FEN);
 }
+
 
 Position::Position()
 {
