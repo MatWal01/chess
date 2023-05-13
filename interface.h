@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <string>
+#include "gameLogic.h"
 #ifndef _INTERFACE_H_
 #define _INTERFACE_H_
 
@@ -51,41 +52,13 @@ public:
     float chessboardSize;
     float pieceSize; // should always be 1/8 of chessboard;
 
-    sf::Sprite returnSprite(char piece);
+    sf::Sprite returnSprite(Piece piece);
     bool loadGameTextures();
     void setTexture();
     void setScale();
     GameGraphics();
 };
 
-
-struct castleRights
-{
-    bool wKingside {true};
-    bool wQueenside {true};
-    bool bKingside {true};
-    bool bQueenside {true};
-
-};
-
-
-class Position
-{
-private:
-    char onMove;
-
-    // castle rights kingside and queenside
-    castleRights castleRights;
-    std::vector<std::vector<char>> pieces;
-
-public:
-    char getPiece(int row, int column);
-    std::string returnFEN();
-    void setPosition(std::string FEN);
-    Position(std::string FEN);
-    Position();
-    Position(Position* prev, std::string move);
-};
 
 
 #endif

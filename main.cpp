@@ -1,6 +1,7 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include "interface.h"
+#include "gameLogic.h"
 
 const int windowHeight {800};
 const int windowWidth {800};
@@ -11,6 +12,7 @@ int main()
     GameGraphics ui;
     ui.loadGameTextures();
     ui.setTexture();
+
     Position curr;
     curr.setPosition("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
@@ -32,8 +34,8 @@ int main()
         {
             for (size_t j {0}; j < 8; j++)
             {
-                char temp = curr.getPiece(i, j);
-                if (temp == '\0')
+                Piece temp = curr.getPiece(i, j);
+                if (temp.pieceSymbol == '\0')
                 {
                     continue;
                 }
