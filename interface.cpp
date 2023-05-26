@@ -3,10 +3,9 @@
 #include "gameLogic.h"
 
 
-sf::Sprite GameGraphics::returnSprite(Piece piece)
+sf::Sprite GameGraphics::returnSprite(char piece)
 {
-    char temp = piece.pieceSymbol;
-    switch (temp)
+    switch (piece)
     {        
         // white pieces
         case 'P':
@@ -41,6 +40,48 @@ sf::Sprite GameGraphics::returnSprite(Piece piece)
             return whiteKing;
         default:
             return blackKing;
+
+    }
+}
+
+
+sf::Sprite* GameGraphics::shareSprite(char temp)
+{
+    switch (temp)
+    {        
+        // white pieces
+        case 'P':
+            return &whitePawn;
+        case 'R':
+            return &whiteRook;
+        case 'N':
+            return &whiteKnight;
+        case 'B':
+            return &whiteBishop;
+        case 'Q':
+            return &whiteQueen;
+        case 'K':
+            return &whiteKing;
+        
+        // black pieces
+        case 'p':
+            return &blackPawn;
+        case 'r':
+            return &blackRook;
+        case 'n':
+            return &blackKnight;
+        case 'b':
+            return &blackBishop;
+        case 'q':
+            return &blackQueen;
+        case 'k':
+            return &blackKing;
+        
+        // no piece
+        case '\0':
+            return &whiteKing;
+        default:
+            return &blackKing;
 
     }
 }
@@ -108,7 +149,7 @@ bool GameGraphics::loadGameTextures()
 }
 
 
-void GameGraphics::setTexture()
+void GameGraphics::setTextures()
 {
 
     whitePawnTexture.setSmooth(true);
@@ -146,10 +187,12 @@ void GameGraphics::setTexture()
 void GameGraphics::setScale()
 {
     sf::FloatRect board = chessboard.getGlobalBounds();
+    
     // I assume all pieces files have the same resolution and are squares
     sf::FloatRect piece = blackRook.getGlobalBounds();
     chessboardSize = board.width;
     float scale = (board.width / 8.0) / piece.width;
+    
     // hopefully all pieces are the same
     pieceSize = piece.width * scale;
 
@@ -176,7 +219,7 @@ GameGraphics::GameGraphics()
         std::cout << "Unable to load textures" << std::endl;
         return;
     }
-    setTexture();
+    setTextures();
     setScale();
     return;
 }

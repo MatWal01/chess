@@ -52,9 +52,10 @@ public:
     float chessboardSize;
     float pieceSize; // should always be 1/8 of chessboard;
 
-    sf::Sprite returnSprite(Piece piece);
+    sf::Sprite returnSprite(char piece);
+    sf::Sprite* shareSprite(char temp);
     bool loadGameTextures();
-    void setTexture();
+    void setTextures();
     void setScale();
     GameGraphics();
 };
