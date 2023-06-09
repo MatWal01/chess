@@ -3,6 +3,26 @@
 #include "gameLogic.h"
 
 
+void GameGraphics::drawPosition(sf::RenderWindow* window, Position* pos)
+{
+    window->draw(chessboard);
+    for (int i {7}; i >= 0; i--)
+        {
+            for (size_t j {0}; j < 8; j++)
+            {
+                char temp = pos->pieces.at(j).at(i);
+                if (temp == '\0')
+                {
+                    continue;
+                }
+                sf::Sprite tempDraw = returnSprite(temp);
+                tempDraw.move(pieceSize * i, pieceSize * (7 - j));
+                window->draw(tempDraw);
+            }
+        }
+}
+
+
 sf::Sprite GameGraphics::returnSprite(char piece)
 {
     switch (piece)
@@ -223,4 +243,3 @@ GameGraphics::GameGraphics()
     setScale();
     return;
 }
-

@@ -49,9 +49,16 @@ public:
     sf::Sprite blackKing;
 
     // size of chessboard and piece rectangles
+    // set by setScale()
     float chessboardSize;
     float pieceSize; // should always be 1/8 of chessboard;
 
+    const int WHEIGHT {800};
+    const int WWIDTH {800};
+    const sf::FloatRect board {0.f, 0.f, 800.f, 800.f};
+
+
+    void drawPosition(sf::RenderWindow* window, Position* pos);
     sf::Sprite returnSprite(char piece);
     sf::Sprite* shareSprite(char temp);
     bool loadGameTextures();
