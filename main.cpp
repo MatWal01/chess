@@ -1,11 +1,8 @@
 #include <iostream>
 #include <random>
 #include <SFML/Graphics.hpp>
-#include "interface.h"
 #include "gameLogic.h"
-
-const int WINDOWHEIGHT {800};
-const int WINDOWWIDTH {800};
+#include "interface.h"
 
 
 int main()
@@ -17,20 +14,58 @@ int main()
     curr.setPosition("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
 
-    sf::RenderWindow window(sf::VideoMode(WINDOWWIDTH, WINDOWHEIGHT), "Chess", sf::Style::Close);
+    sf::RenderWindow window(sf::VideoMode(ui.WWIDTH, ui.WHEIGHT), "Chess", sf::Style::Close);
+    sf::Vector2i mouse;
+    sf::Vector2f mouseF;
+
+    bool firstClick {false};
+    piecePos firstPos {0, 0};
+    bool secondClick {false};
+    piecePos secondPos {0, 0};    
 
     while (window.isOpen())
     {
+        mouse = sf::Mouse::getPosition(window);
         sf::Event event;
         while (window.pollEvent(event))
         {
             if (event.type == sf::Event::Closed)
                 window.close();
+
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+            {
+                mouseF = window.mapPixelToCoords(mouse);
+                if (ui.board.contains(mouseF))
+                {
+                    if (firstClick == false)
+                    {
+                        firstClick = true;
+                        firstPos.file = mouse.x / 100;
+                        firstPos.rank = 7 - mouse.y / 100;
+                        std::cout << mouse.x << " " << mouse.y << ": ";
+                        std::cout << firstPos.rank << " " <<firstPos.file << std::endl;
+                    }
+                    else if(secondClick == false)
+                    {
+                        secondClick = true;
+                        secondPos.file = mouse.x / 100;
+                        secondPos.rank = 7 - mouse.y / 100;
+                        std::cout << secondPos.rank << " " << secondPos.file << std::endl;
+                    }
+                }
+            }
+        
+            if (firstClick == true && secondClick == true)
+            {
+                curr.movePiece(firstPos, secondPos);
+                firstClick = false;
+                secondClick = false;
+            }
         }
 
-        window.clear();
-        curr.drawPosition(&window, &ui);
+        ui.drawPosition(&window, &curr);
         window.display();
+        window.clear();
     }
 
     return 0;
