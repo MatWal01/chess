@@ -4,8 +4,14 @@
 #include <vector>
 #include <memory>
 #include <SFML/Graphics.hpp>
-#include "interface.h"
+// if i #include "interface.h" everything falls apart
 
+
+struct piecePos
+{
+    int rank;
+    int file;
+};
 
 class Position
 {
@@ -25,12 +31,11 @@ public:
     std::vector<std::vector<char>> pieces;
 
 private:
-    bool isMoveLegal(int pieceRank, int pieceFile, int newRank, int newFile);
-    bool isPinned(int pieceRank, int pieceFile);
-    bool isInCheck(int pieceRank, int pieceFile);
+    bool isMoveLegal(piecePos curr, piecePos next);
+    bool isPinned(piecePos curr);
+    bool isInCheck(piecePos curr);
 public:
-    bool movePiece(int pieceFile, int pieceRank, int newFile, int newRank);
-    void drawPosition(sf::RenderWindow* window, GameGraphics* ui);
+    bool movePiece(piecePos curr, piecePos next);
     void setPosition(std::string FEN);
     std::string returnFEN();
     Position(std::string FEN);

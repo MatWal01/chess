@@ -3,54 +3,137 @@
 #include <iostream>
 
 
-bool Position::isMoveLegal(int pieceRank, int pieceFile, int newRank, int newFile)
+bool Position::isMoveLegal(piecePos curr, piecePos next)
 {
-    if (pieces.at(newRank).at(newFile) == '\0')
+    // check if any given rank/file is within the chessboard bounds
+    if (curr.rank > 7 || curr.rank < 0)
+    {
+        return false;
+    }
+    else if (curr.file > 7 || curr.file < 0)
+    {
+        return false;
+    }
+    else if (next.rank > 7 || next.rank < 0)
+    {
+        return false;
+    }
+    else if (next.file > 7 || next.file < 0)
+    {
+        return false;
+    }
+
+    // check if the place you want move the piece to is occupied by your other piece
+    if (pieces.at(next.rank).at(next.file) == '\0')
     {
         ;
     }
-    else if (std::islower(pieces.at(pieceRank).at(pieceFile)) == std::islower(pieces.at(newRank).at(newFile)))
+    else if (std::islower(pieces.at(curr.rank).at(curr.file)) == std::islower(pieces.at(next.rank).at(next.file)))
     {
         return false;
     }
 
-    char temp = toupper(pieces.at(pieceRank).at(pieceFile));
 
+    char temp = pieces.at(curr.rank).at(curr.file);
 
-    if (isPinned(pieceRank, pieceFile))
-    {
-        return false;
-    }
+    // // check if the piece you want to move is pinned to your king
+    // if (isPinned(curr))
+    // {
+    //     return false;
+    // }
 
-    switch(temp)
-    {
-        case '\0':
-            return false;
-        default:
-        case 'P':
+    // if (onMove == 'w')
+    // {
+    //             switch(temp)
+    //     {
+    //         case '\0':
+    //             return false;
+    //         default:
+    //         case 'P':
+    //         {
+    //             // check for captures
+    //             if (islower(pieces.at(next.rank).at(curr.file)) && pieces.at(next.rank).at(curr.file) != '\0')
+    //             {
+    //                 if (next.rank - curr.rank != -1) // not sure if i should use -1 or 1 lmao
+    //                 {
+    //                     return false;
+    //                 }
 
-        case 'R':
+    //                 if (!(next.file - curr.file == 1 || next.file - curr.file == -1))
+    //                 {
+    //                     return false;
+    //                 }
+    //             }
+    //             // check for en passant
 
-        case 'N':
+    //             // check for first move (2 squares ahead)
 
-        case 'B':
+    //             // check for move 1 square ahead
+                    
+    //         }
+    //         case 'R':
+            
+    //         case 'N':
 
-        case 'Q':
+    //         case 'B':
 
-        case 'K':
-            return true;
-    }
+    //         case 'Q':
 
+    //         case 'K':
+    //             return true;
+    //     }
+    // }
+    // else
+    // {
+    //     switch(temp)
+    //     {
+    //         case '\0':
+    //             return false;
+    //         default:
+    //         case 'p':
+    //         {
+    //             // check for captures
+    //             if (islower(pieces.at(next.rank).at(curr.file)) && pieces.at(next.rank).at(curr.file) != '\0')
+    //             {
+    //                 if (next.rank - curr.rank != -1) // not sure if i should use -1 or 1 lmao
+    //                 {
+    //                     return false;
+    //                 }
 
+    //                 if (!(next.file - curr.file == 1 || next.file - curr.file == -1))
+    //                 {
+    //                     return false;
+    //                 }
+    //             }
+    //             // check for en passant
+
+    //             // check for first move (2 squares ahead)
+
+    //             // check for move 1 square ahead
+                    
+    //         }
+    //         case 'r':
+
+    //         case 'n':
+
+    //         case 'b':
+
+    //         case 'q':
+
+    //         case 'k':
+    //             return true;
+    //     }
+
+    // }
 
     return true;
 }
 
 // check if the piece you want to move is pinned to their king
-bool Position::isPinned(int pieceRank, int pieceFile)
+bool Position::isPinned(piecePos curr)
 {
     // find their king
-    char temp = pieces.at(pieceRank).at(pieceFile);
+    char temp = pieces.at(curr.rank).at(curr.file);
     int kingRank {-1};
     int kingFile {-1};
 
@@ -72,11 +155,11 @@ bool Position::isPinned(int pieceRank, int pieceFile)
     }
 
     // check if piece is on the same file/rank as their king
-    if (pieceRank - kingRank == 0)
+    if (curr.rank - kingRank == 0)
     {
         
     }
-    else if (pieceFile - kingFile == 0)
+    else if (curr.file - kingFile == 0)
     {
 
     }
@@ -92,29 +175,29 @@ bool Position::isPinned(int pieceRank, int pieceFile)
 }
 
 
-bool Position::movePiece(int pieceRank, int pieceFile, int newRank, int newFile)
+bool Position::movePiece(piecePos curr, piecePos next)
 {
-    if (!isMoveLegal(pieceRank, pieceFile, newRank, newFile))
+    if (!isMoveLegal(curr, next))
     {
         return false;
     }
 
-    char temp = pieces.at(pieceRank).at(pieceFile);
-    pieces.at(pieceRank).at(pieceFile) ='\0';
-    pieces.at(newRank).at(newFile) = temp;
+    char temp = pieces.at(curr.rank).at(curr.file);
+    pieces.at(curr.rank).at(curr.file) ='\0';
+    pieces.at(next.rank).at(next.file) = temp;
     return true;
 }
 
 
-bool Position::isInCheck(int pieceRank, int pieceFile)
+bool Position::isInCheck(piecePos curr)
 {
     bool isInCheck {false};
-    char king = pieces.at(pieceRank).at(pieceFile);
+    char king = pieces.at(curr.rank).at(curr.file);
     // check for Rooks/Queens
     // Ranks
     for (size_t j {0}; j < 8; j++)
     {
-        char temp = pieces.at(pieceRank).at(j);
+        char temp = pieces.at(curr.rank).at(j);
         if (king = temp)
         {
             break;
@@ -165,7 +248,7 @@ bool Position::isInCheck(int pieceRank, int pieceFile)
 
     for (int j {7}; j >= 0; j--)
     {
-        char temp = pieces.at(pieceRank).at(j);
+        char temp = pieces.at(curr.rank).at(j);
         if (king = temp)
         {
             break;
@@ -217,7 +300,7 @@ bool Position::isInCheck(int pieceRank, int pieceFile)
     // Files
     for (size_t i {0}; i < 8; i++)
     {
-        char temp = pieces.at(i).at(pieceFile);
+        char temp = pieces.at(i).at(curr.file);
         if (king = temp)
         {
             break;
@@ -268,7 +351,7 @@ bool Position::isInCheck(int pieceRank, int pieceFile)
 
     for (int i {7}; i >= 0; i--)
     {
-        char temp = pieces.at(i).at(pieceFile);
+        char temp = pieces.at(i).at(curr.file);
         if (king = temp)
         {
             break;
@@ -328,27 +411,6 @@ bool Position::isInCheck(int pieceRank, int pieceFile)
 }
 
 
-void Position::drawPosition(sf::RenderWindow* window, GameGraphics* ui)
-{
-    window->draw(ui->chessboard);
-    for (int i {7}; i >= 0; i--)
-        {
-            for (size_t j {0}; j < 8; j++)
-            {
-                char temp = pieces.at(j).at(i);
-                if (temp == '\0')
-                {
-                    continue;
-                }
-                sf::Sprite tempDraw = ui->returnSprite(temp);
-                tempDraw.move(ui->pieceSize * i, ui->pieceSize * (7 - j));
-                window->draw(tempDraw);
-            }
-        }
-}
-
-
-
 // sets a position 2D vector of chars from FEN
 void Position::setPosition(std::string FEN)
 {
@@ -402,7 +464,7 @@ Position::Position(std::string FEN)
     setPosition(FEN);
 }
 
-
+// Doesnt work lmao
 Position::Position()
 {
     Position("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
