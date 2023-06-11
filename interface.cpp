@@ -3,9 +3,15 @@
 #include "gameLogic.h"
 
 
-void GameGraphics::drawPosition(sf::RenderWindow* window, Position* pos)
+void GameGraphics::drawChessboard(sf::RenderWindow* window)
 {
     window->draw(chessboard);
+}
+
+
+void GameGraphics::drawPosition(sf::RenderWindow* window, Position* pos)
+{
+    
     for (int i {7}; i >= 0; i--)
         {
             for (size_t j {0}; j < 8; j++)

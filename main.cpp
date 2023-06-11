@@ -21,10 +21,16 @@ int main()
     bool firstClick {false};
     piecePos firstPos {0, 0};
     bool secondClick {false};
-    piecePos secondPos {0, 0};    
+    piecePos secondPos {0, 0};
+    sf::RectangleShape picked;
+    picked.setPosition(800.f, 800.f);
+    picked.setFillColor(sf::Color::Green);
+    picked.setSize(sf::Vector2f(100.f, 100.f));
+
 
     while (window.isOpen())
     {
+        ui.drawChessboard(&window);
         mouse = sf::Mouse::getPosition(window);
         sf::Event event;
         while (window.pollEvent(event))
@@ -42,19 +48,29 @@ int main()
                         firstClick = true;
                         firstPos.file = mouse.x / 100;
                         firstPos.rank = 7 - mouse.y / 100;
-                        std::cout << mouse.x << " " << mouse.y << ": ";
-                        std::cout << firstPos.rank << " " <<firstPos.file << std::endl;
+                        picked.setPosition(firstPos.file * 100.f, (7 - firstPos.rank) * 100.f);
                     }
                     else if(secondClick == false)
                     {
-                        secondClick = true;
                         secondPos.file = mouse.x / 100;
                         secondPos.rank = 7 - mouse.y / 100;
-                        std::cout << secondPos.rank << " " << secondPos.file << std::endl;
+                        if (secondPos.file == firstPos.file && secondPos.rank == firstPos.rank)
+                        {
+                            secondClick = false;
+                            break;
+                        }
+                        secondClick = true;
                     }
                 }
             }
-        
+
+
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
+            {
+                firstClick = false;
+                secondClick = false;
+            }
+
             if (firstClick == true && secondClick == true)
             {
                 curr.movePiece(firstPos, secondPos);
@@ -63,6 +79,7 @@ int main()
             }
         }
 
+        window.draw(picked);
         ui.drawPosition(&window, &curr);
         window.display();
         window.clear();

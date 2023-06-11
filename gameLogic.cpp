@@ -5,6 +5,13 @@
 
 bool Position::isMoveLegal(piecePos curr, piecePos next)
 {
+    // check if correct piece colour was chosen
+    if (!(islower(onMove) == islower(pieces.at(curr.rank).at(curr.file))))
+    {
+        return false;
+    }
+
+
     // check if any given rank/file is within the chessboard bounds
     if (curr.rank > 7 || curr.rank < 0)
     {
@@ -22,6 +29,13 @@ bool Position::isMoveLegal(piecePos curr, piecePos next)
     {
         return false;
     }
+
+    // check if there is a piece
+    if (pieces.at(curr.rank).at(curr.file) == '\0')
+    {
+        return false;
+    }
+
 
     // check if the place you want move the piece to is occupied by your other piece
     if (pieces.at(next.rank).at(next.file) == '\0')
@@ -179,12 +193,24 @@ bool Position::movePiece(piecePos curr, piecePos next)
 {
     if (!isMoveLegal(curr, next))
     {
+        std::cout << "illegal" << std::endl;
         return false;
     }
 
     char temp = pieces.at(curr.rank).at(curr.file);
     pieces.at(curr.rank).at(curr.file) ='\0';
     pieces.at(next.rank).at(next.file) = temp;
+    
+    if (onMove == 'W')
+    {
+        onMove = 'b';
+    }
+    else
+    {
+        onMove = 'W';
+    }
+    
+    std::cout << "legal" << std::endl;
     return true;
 }
 
