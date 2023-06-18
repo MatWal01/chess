@@ -16,7 +16,7 @@ struct piecePos
 class Position
 {
 public:
-    char onMove;
+    char onMove {'W'};
     std::string move;
 
     std::unique_ptr<Position> prev;
@@ -34,6 +34,9 @@ private:
     bool isMoveLegal(piecePos curr, piecePos next);
     bool isPinned(piecePos curr);
     bool isInCheck(piecePos curr);
+    bool isInBoardBounds(piecePos curr);
+    bool areObstaclesSideway(piecePos curr, piecePos next);
+    bool areObstaclesDiagonally(piecePos curr, piecePos next);
 public:
     bool movePiece(piecePos curr, piecePos next);
     void setPosition(std::string FEN);
