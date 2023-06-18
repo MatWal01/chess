@@ -22,6 +22,7 @@ int main()
     piecePos firstPos {0, 0};
     bool secondClick {false};
     piecePos secondPos {0, 0};
+    
     sf::RectangleShape picked;
     picked.setPosition(800.f, 800.f);
     picked.setFillColor(sf::Color::Green);
@@ -69,13 +70,21 @@ int main()
             {
                 firstClick = false;
                 secondClick = false;
+                picked.setPosition(800.f, 800.f);
             }
 
             if (firstClick == true && secondClick == true)
             {
-                curr.movePiece(firstPos, secondPos);
                 firstClick = false;
                 secondClick = false;
+
+                if (!curr.movePiece(firstPos, secondPos))
+                {
+                    firstClick = true;
+                    firstPos.file = mouse.x / 100;
+                    firstPos.rank = 7 - mouse.y / 100;
+                    picked.setPosition(firstPos.file * 100.f, (7 - firstPos.rank) * 100.f);
+                }
             }
         }
 
