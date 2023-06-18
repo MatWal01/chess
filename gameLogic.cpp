@@ -22,12 +22,11 @@ bool Position::isMoveLegal(piecePos curr, piecePos next)
         return false;
     }
 
-    // check if there is a piece
-    if (pieces.at(curr.rank).at(curr.file) == '\0')
+    // check if the king could be captured in the next move (illegal)
+    if (isInCheck(next))
     {
         return false;
     }
-
 
     // check if the place you want move the piece to is occupied by your other piece
     if (pieces.at(next.rank).at(next.file) == '\0')
@@ -41,15 +40,9 @@ bool Position::isMoveLegal(piecePos curr, piecePos next)
 
     char temp = pieces.at(curr.rank).at(curr.file);
 
-    // check if the piece you want to move is pinned to your king
-    if (isPinned(curr))
-    {
-        return false;
-    }
-
     switch(temp)
     {
-        case '\0':
+        case '\0':  // check if there is a piece
             return false;
         case 'p':
         {
@@ -84,6 +77,7 @@ bool Position::isMoveLegal(piecePos curr, piecePos next)
             {
                 return true;
             }
+
             return false;
         }
         case 'P':
@@ -121,12 +115,13 @@ bool Position::isMoveLegal(piecePos curr, piecePos next)
             {
                 return true;
             }
+
             return false;
         }
         case 'r':
         case 'R':
         {
-            if (areObstaclesSideway(curr, next))
+            if (invalidRookMove(curr, next))
             {
                 return false;
             }
@@ -194,83 +189,25 @@ bool Position::isMoveLegal(piecePos curr, piecePos next)
             {
                 return true;
             }
-            else
-            {
-                return false;
-            }
             
+            return false;
         }
         case 'b':
         case 'B':
         {
-            int y {64};
-            int x {-64};
-
-            // check if the move is diagonal
-            if (curr.rank > next.rank)
-            {
-                y = curr.rank - next.rank;
-            }
-            else
-            {
-                y = next.rank - curr.rank;
-            }
-
-            if (curr.file > next.file)
-            {
-                x = curr.file - next.file;
-            }
-            else
-            {
-                x = next.file - curr.file;
-            }
-
-            if (x != y)
-            {
-                return false;
-            }
-
-            if (areObstaclesDiagonally(curr, next))
+            if (invalidDiagonalMove(curr, next))
             {
                 return false;
             }
 
             return true;
-
         }
         case 'q':
         case 'Q':
         {
-            if (areObstaclesSideway(curr, next))
+            if (invalidRookMove(curr, next))
             {
-                int y {64};
-                int x {-64};
-
-                // check if the move is diagonal
-                if (curr.rank > next.rank)
-                {
-                    y = curr.rank - next.rank;
-                }
-                else
-                {
-                    y = next.rank - curr.rank;
-                }
-
-                if (curr.file > next.file)
-                {
-                    x = curr.file - next.file;
-                }
-                else
-                {
-                    x = next.file - curr.file;
-                }
-
-                if (x != y)
-                {
-                    return false;
-                }
-
-                if (areObstaclesDiagonally(curr, next))
+                if (invalidDiagonalMove(curr, next))
                 {
                     return false;
                 }
@@ -288,14 +225,7 @@ bool Position::isMoveLegal(piecePos curr, piecePos next)
                 (curr.file - next.file <= 1 && curr.file - next.file >= -1)
                 )
                 {
-                    if (!isInCheck(next))
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
+                    return true;
                 }
 
             // castle
@@ -304,7 +234,7 @@ bool Position::isMoveLegal(piecePos curr, piecePos next)
                 return false;
             }
             
-            if (areObstaclesSideway(curr, next))
+            if (invalidRookMove(curr, next))
             {
                 return false;
             }
@@ -338,57 +268,60 @@ bool Position::isMoveLegal(piecePos curr, piecePos next)
         }
     }
 
+    std::cout << "this should never happen" << std::endl;
     return false;
 }
 
 
 // check if the piece you want to move is pinned to their king
-bool Position::isPinned(piecePos curr)
-{
-    // find their king
-    char temp = pieces.at(curr.rank).at(curr.file);
+// redundant use isInCheck(next) instead, also unfinished
+// kept just because stackoverflow sugested to use goto there (and in 2 other places on the same day)
+// bool Position::isPinned(piecePos curr)
+// {
+//     // find their king
+//     char temp = pieces.at(curr.rank).at(curr.file);
 
-    if (temp == 'k' || temp == 'K')
-    {
-        return false;
-    }
+//     if (temp == 'k' || temp == 'K')
+//     {
+//         return false;
+//     }
 
-    int kingRank {-1};
-    int kingFile {-1};
+//     int kingRank {-1};
+//     int kingFile {-1};
 
-    for (size_t rank {0}; rank < 8; rank++)
-    {
-        for (size_t file {0}; file < 8; file++)
-        {       
-            if (
-                toupper(pieces.at(rank).at(file)) == 'K'
-                &&
-                isupper(pieces.at(rank).at(file)) == islower(temp)
-                )
-                {
-                    kingRank = rank;
-                    kingFile = file;
-                    // use goto from there lmao??
-                }
-        }
-    }
+//     for (size_t rank {0}; rank < 8; rank++)
+//     {
+//         for (size_t file {0}; file < 8; file++)
+//         {       
+//             if (
+//                 toupper(pieces.at(rank).at(file)) == 'K'
+//                 &&
+//                 isupper(pieces.at(rank).at(file)) == islower(temp)
+//                 )
+//                 {
+//                     kingRank = rank;
+//                     kingFile = file;
+//                     // use goto from there lmao??
+//                 }
+//         }
+//     }
 
-    // check if piece is on the same file/rank as their king
-    if (curr.rank - kingRank == 0)
-    {
+//     // check if piece is on the same file/rank as their king
+//     if (curr.rank - kingRank == 0)
+//     {
         
-    }
-    else if (curr.file - kingFile == 0)
-    {
+//     }
+//     else if (curr.file - kingFile == 0)
+//     {
 
-    }
+//     }
 
-    // check if piece is on the same diagonal as their king
-    bool sameDiagonal {false};
+//     // check if piece is on the same diagonal as their king
+//     bool sameDiagonal {false};
     
 
-    return false;
-}
+//     return false;
+// }
 
 
 bool Position::isInBoardBounds(piecePos curr)
@@ -408,8 +341,8 @@ bool Position::isInBoardBounds(piecePos curr)
 }
 
 
-// check for obstacles (only rook move)
-bool Position::areObstaclesSideway(piecePos curr, piecePos next)
+// check for obstacles (rook move) and a valid vertical/horizontal move
+bool Position::invalidRookMove(piecePos curr, piecePos next)
 {
     if (curr.file == next.file)
     {
@@ -465,9 +398,36 @@ bool Position::areObstaclesSideway(piecePos curr, piecePos next)
 }
 
 
-// check for obstacles (bishop move), has to take valid diagonal move
-bool Position::areObstaclesDiagonally(piecePos curr, piecePos next)
+// check for obstacles (bishop move) and a valid diagonal
+bool Position::invalidDiagonalMove(piecePos curr, piecePos next)
 {
+    int y {64};
+    int x {-64};
+
+    // if absolute values of (old.x - new.x) and (old.y - new.y) are equal then its a diagonal move
+    if (curr.rank > next.rank)
+    {
+        y = curr.rank - next.rank;
+    }
+    else
+    {
+        y = next.rank - curr.rank;
+    }
+
+    if (curr.file > next.file)
+    {
+        x = curr.file - next.file;
+    }
+    else
+    {
+        x = next.file - curr.file;
+    }
+
+    if (x != y)
+    {
+        return true;
+    }
+    
     if (curr.rank > next.rank)
     {
         if (curr.file > next.file)
@@ -528,7 +488,7 @@ bool Position::movePiece(piecePos curr, piecePos next)
         return false;
     }
 
-    if (temp == 'K' || temp == 'k')
+    if (temp == 'K')
     {
         if (curr.file == next.file + 2)
         {
@@ -544,6 +504,35 @@ bool Position::movePiece(piecePos curr, piecePos next)
             wKingside = {false};
             pieces.at(next.rank).at(next.file - 1) = pieces.at(next.rank).at(next.file + 1);
             pieces.at(next.rank).at(next.file + 1) = '\0';
+        }
+        else
+        {
+            wQueenside = {false};
+            wKingside = {false};
+        }
+    }
+
+    if (temp == 'k')
+    {
+        if (curr.file == next.file + 2)
+        {
+            bQueenside = {false};
+            bKingside = {false};
+            pieces.at(next.rank).at(next.file + 1) = pieces.at(next.rank).at(next.file - 2);
+            pieces.at(next.rank).at(next.file - 2) = '\0';
+
+        }
+        else if (curr.file == next.file - 2)
+        {
+            bQueenside = {false};
+            bKingside = {false};
+            pieces.at(next.rank).at(next.file - 1) = pieces.at(next.rank).at(next.file + 1);
+            pieces.at(next.rank).at(next.file + 1) = '\0';
+        }
+        else
+        {
+            bQueenside = {false};
+            bKingside = {false};
         }
     }
 
@@ -568,6 +557,54 @@ bool Position::isInCheck(piecePos curr)
 {
     bool isInCheck {false};
 
+    // check for pawns
+    if (onMove == 'W')
+    {
+
+    }
+    else
+    {
+
+    }
+
+    // check for queens (using funtions below)
+    // check for rooks
+    for (int i {0}; i < 8; i++)
+    {
+        if (onMove == 'W')
+        {
+            if (pieces.at(curr.rank).at(i) == 'r' || pieces.at(curr.rank).at(i) == 'q')
+            {
+                if (!invalidRookMove(curr, piecePos {curr.rank, i}))
+                {
+                    return true;
+                }
+
+                if (!invalidRookMove(curr, piecePos {i, curr.rank}))
+                {
+                    return true;
+                }
+            }
+        }
+        else
+        {
+            if (pieces.at(curr.rank).at(i) == 'r' || pieces.at(curr.rank).at(i) == 'q')
+            {
+                if (!invalidRookMove(curr, piecePos {curr.rank, i}))
+                {
+                    return true;
+                }
+
+                if (!invalidRookMove(curr, piecePos {i, curr.rank}))
+                {
+                    return true;
+                }
+            }
+        }
+    }
+
+
+    // check for
 
 
     return false;
@@ -661,7 +698,8 @@ void Position::setPosition(std::string FEN)
         charCounter++;
     }
     charCounter++;
-
+    
+    // TODO: enpassant move
     // TODO: halfmoves counter
 
     return;
