@@ -57,7 +57,7 @@ public:
     const int WWIDTH {800};
     const sf::FloatRect board {0.f, 0.f, 800.f, 800.f};
 
-
+    void drawChessboard(sf::RenderWindow* window);
     void drawPosition(sf::RenderWindow* window, Position* pos);
     sf::Sprite returnSprite(char piece);
     sf::Sprite* shareSprite(char temp);
