@@ -3,15 +3,66 @@
 #include "gameLogic.h"
 
 
-void GameGraphics::drawChessboard(sf::RenderWindow* window)
+void GameGraphics::leftMouseInteract(sf::RenderWindow* const window, Position* const curr)
+{
+    mouseF = window->mapPixelToCoords(mouse);
+    if (board.contains(mouseF))
+    {
+        if (firstClick == false)
+        {
+            firstClick = true;
+            firstPos.file = mouse.x / 100.f;
+            firstPos.rank = 7 - mouse.y / 100.f + 1;
+            picked.setPosition(firstPos.file * pieceSize, (7 - firstPos.rank) * pieceSize);
+            getLegalMoves(curr);
+        }
+        else if(secondClick == false)
+        {
+            secondPos.file = mouse.x / 100.f;
+            secondPos.rank = 7 - mouse.y / 100.f + 1;
+            secondClick = true;
+            if (secondPos.file == firstPos.file && secondPos.rank == firstPos.rank)
+            {
+                firstClick = false;
+                secondClick = false;
+            }
+        }
+    }
+
+    if (firstClick == true && secondClick == true)
+    {
+        firstClick = false;
+        secondClick = false;
+
+        if (!curr->movePiece(firstPos, secondPos))
+        {
+            firstPos.file = mouse.x / 100.f;
+            firstPos.rank = 7 - mouse.y / 100.f + 1;
+            picked.setPosition(firstPos.file * pieceSize, (7 - firstPos.rank) * pieceSize);
+        }
+        picked.setPosition({chessboardSize, chessboardSize});
+        resetLegalMoves();
+    }
+}
+
+
+void GameGraphics::resetPicked()
+{
+    firstClick = false;
+    secondClick = false;
+    picked.setPosition(chessboardSize, chessboardSize);
+    resetLegalMoves();
+}
+
+
+void GameGraphics::drawChessboard(sf::RenderWindow* const window)
 {
     window->draw(chessboard);
 }
 
 
-void GameGraphics::drawPosition(sf::RenderWindow* window, Position* pos)
+void GameGraphics::drawPosition(sf::RenderWindow* const window, Position* const pos)
 {
-    
     for (int i {7}; i >= 0; i--)
         {
             for (size_t j {0}; j < 8; j++)
@@ -26,6 +77,46 @@ void GameGraphics::drawPosition(sf::RenderWindow* window, Position* pos)
                 window->draw(tempDraw);
             }
         }
+}
+
+
+void GameGraphics::getLegalMoves(Position* const pos)
+{
+    for (int rank {0}; rank < 8; rank++)
+    {
+        for (int file {0}; file < 8; file++)
+        {
+            legalMoves[rank][file] = pos->isMoveLegal(firstPos, {rank, file});
+        }
+    }
+}
+
+
+void GameGraphics::resetLegalMoves()
+{
+    for (int rank {0}; rank < 8; rank++)
+    {
+        for (int file {0}; file < 8; file++)
+        {
+            legalMoves[rank][file] = false;
+        }
+    }
+}
+
+
+void GameGraphics::drawLegalMoves(sf::RenderWindow* const window, Position* const pos)
+{
+    for (int rank {0}; rank < 8; rank++)
+    {
+        for (int file {0}; file < 8; file++)
+        {
+            if (legalMoves[rank][file])
+            {
+                legalMove.setPosition(file * pieceSize + circleOffset, (7 - rank) * pieceSize + circleOffset);
+                window->draw(legalMove);
+            }
+        }
+    }
 }
 
 
@@ -235,6 +326,12 @@ void GameGraphics::setScale()
     blackBishop.setScale(scale, scale);
     blackQueen.setScale(scale, scale);
     blackKing.setScale(scale, scale);
+
+    picked.setSize(sf::Vector2f(scale * chessboardSize, scale * chessboardSize));
+    legalMove.setRadius(scale * 150.f);
+
+    circleOffset = 0.125 * 400 - 150.f * 0.125;
+
 }
 
 
@@ -245,6 +342,13 @@ GameGraphics::GameGraphics()
         std::cout << "Unable to load textures" << std::endl;
         return;
     }
+
+    picked.setPosition(800.f, 800.f);
+    picked.setFillColor(sf::Color::Green);
+
+    legalMove.setPosition(300.f, 300.f);
+    legalMove.setFillColor(sf::Color(0,200,0,150));
+
     setTextures();
     setScale();
     return;
