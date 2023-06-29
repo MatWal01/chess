@@ -11,85 +11,36 @@ int main()
     Position curr;      // turn this into a pointer in the future
     ui.loadGameTextures();
     ui.setTextures();
-    curr.setPosition("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    curr.setPosition("rnbq1bnr/pppppppp/8/3k4/3K4/8/PPPPPPPP/RNBQ1BNR w KQkq - 0 1");
 
 
     sf::RenderWindow window(sf::VideoMode(ui.WWIDTH, ui.WHEIGHT), "Chess", sf::Style::Close);
-    sf::Vector2i mouse;
-    sf::Vector2f mouseF;
-
-    bool firstClick {false};
-    piecePos firstPos {0, 0};
-    bool secondClick {false};
-    piecePos secondPos {0, 0};
-    
-    sf::RectangleShape picked;
-    picked.setPosition(800.f, 800.f);
-    picked.setFillColor(sf::Color::Green);
-    picked.setSize(sf::Vector2f(100.f, 100.f));
 
 
     while (window.isOpen())
     {
         ui.drawChessboard(&window);
-        mouse = sf::Mouse::getPosition(window);
+        ui.mouse = sf::Mouse::getPosition(window);
         sf::Event event;
         while (window.pollEvent(event))
         {
             if (event.type == sf::Event::Closed)
                 window.close();
 
-            if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
-            {
-                mouseF = window.mapPixelToCoords(mouse);
-                if (ui.board.contains(mouseF))
-                {
-                    if (firstClick == false)
-                    {
-                        firstClick = true;
-                        firstPos.file = mouse.x / 100;
-                        firstPos.rank = 7 - mouse.y / 100;
-                        picked.setPosition(firstPos.file * 100.f, (7 - firstPos.rank) * 100.f);
-                    }
-                    else if(secondClick == false)
-                    {
-                        secondPos.file = mouse.x / 100;
-                        secondPos.rank = 7 - mouse.y / 100;
-                        if (secondPos.file == firstPos.file && secondPos.rank == firstPos.rank)
-                        {
-                            secondClick = false;
-                            break;
-                        }
-                        secondClick = true;
-                    }
-                }
-            }
-
-
             if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
             {
-                firstClick = false;
-                secondClick = false;
-                picked.setPosition(800.f, 800.f);
+                ui.resetPicked();
             }
 
-            if (firstClick == true && secondClick == true)
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
             {
-                firstClick = false;
-                secondClick = false;
-
-                if (!curr.movePiece(firstPos, secondPos))
-                {
-                    firstClick = true;
-                    firstPos.file = mouse.x / 100;
-                    firstPos.rank = 7 - mouse.y / 100;
-                    picked.setPosition(firstPos.file * 100.f, (7 - firstPos.rank) * 100.f);
-                }
+                ui.leftMouseInteract(&window, &curr);
             }
         }
 
-        window.draw(picked);
+        window.draw(ui.picked);
         ui.drawPosition(&window, &curr);
+        ui.drawLegalMoves(&window, &curr);
         window.display();
         window.clear();
     }
