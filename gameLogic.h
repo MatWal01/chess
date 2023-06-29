@@ -16,8 +16,13 @@ struct piecePos
 class Position
 {
 public:
+
+    size_t moves {0};
+    size_t halfmoves {0};
+
     char onMove {'W'};
     std::string move;
+    std::string FEN;
 
     std::unique_ptr<Position> prev;
     std::unique_ptr<Position> next;
@@ -31,18 +36,19 @@ public:
     std::vector<std::vector<char>> pieces;
 
 private:
-    bool isMoveLegal(piecePos curr, piecePos next);
-    bool isInCheck(piecePos curr);
+    bool isInCheck();
+    bool isInCheck(piecePos curr, piecePos next);
     bool isInBoardBounds(piecePos curr);
     bool invalidRookMove(piecePos curr, piecePos next);
     bool invalidDiagonalMove(piecePos curr, piecePos next);
 public:
+    bool isMoveLegal(piecePos curr, piecePos next);
     bool movePiece(piecePos curr, piecePos next);
     void setPosition(std::string FEN);
     std::string returnFEN();
     Position(std::string FEN);
     Position();
-    Position(Position* prev, std::string move);
+    Position(Position* const prev, piecePos curr, piecePos next);
 };
 
 #endif
