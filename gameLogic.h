@@ -21,28 +21,41 @@ public:
     size_t halfmoves {0};
 
     char onMove {'W'};
-    std::string move;
+    std::string enpassant;
     std::string FEN;
 
     std::unique_ptr<Position> prev;
     std::unique_ptr<Position> next;
 
     // castle rights kingside and queenside
-    bool wKingside {true};
-    bool wQueenside {true};
-    bool bKingside {true};
-    bool bQueenside {true};
+    bool wKingside {false};
+    bool wQueenside {false};
+    bool bKingside {false};
+    bool bQueenside {false};
+
+    bool end {false};
     
-    std::vector<std::vector<char>> pieces;
+    std::vector<std::vector<char>> pieces {
+        {'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'},
+        {'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'},
+        {'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'},
+        {'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'},
+        {'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'},
+        {'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'},
+        {'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'},
+        {'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'}
+        };
 
 private:
     bool isInCheck();
-    bool isInCheck(piecePos curr, piecePos next);
+    bool areLegalMovesLeft();
     bool isInBoardBounds(piecePos curr);
     bool invalidRookMove(piecePos curr, piecePos next);
     bool invalidDiagonalMove(piecePos curr, piecePos next);
 public:
+    bool isInCheck(piecePos curr, piecePos next);
     bool isMoveLegal(piecePos curr, piecePos next);
+    bool isProperPieceMove(piecePos curr, piecePos next);
     bool movePiece(piecePos curr, piecePos next);
     void setPosition(std::string FEN);
     std::string returnFEN();

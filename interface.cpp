@@ -21,12 +21,12 @@ void GameGraphics::leftMouseInteract(sf::RenderWindow* const window, Position* c
             secondPos.file = mouse.x / 100.f;
             secondPos.rank = 7 - mouse.y / 100.f + 1;
             secondClick = true;
-            if (secondPos.file == firstPos.file && secondPos.rank == firstPos.rank)
-            {
-                firstClick = false;
-                secondClick = false;
-            }
         }
+    }
+
+    if (secondPos.file == firstPos.file && secondPos.rank == firstPos.rank)
+    {
+        secondClick = false;
     }
 
     if (firstClick == true && secondClick == true)
@@ -55,6 +55,7 @@ void GameGraphics::resetPicked()
 }
 
 
+
 void GameGraphics::drawChessboard(sf::RenderWindow* const window)
 {
     window->draw(chessboard);
@@ -64,19 +65,19 @@ void GameGraphics::drawChessboard(sf::RenderWindow* const window)
 void GameGraphics::drawPosition(sf::RenderWindow* const window, Position* const pos)
 {
     for (int i {7}; i >= 0; i--)
+    {
+        for (size_t j {0}; j < 8; j++)
         {
-            for (size_t j {0}; j < 8; j++)
+            char temp = pos->pieces.at(j).at(i);
+            if (temp == '\0')
             {
-                char temp = pos->pieces.at(j).at(i);
-                if (temp == '\0')
-                {
-                    continue;
-                }
-                sf::Sprite tempDraw = returnSprite(temp);
-                tempDraw.move(pieceSize * i, pieceSize * (7 - j));
-                window->draw(tempDraw);
+                continue;
             }
+            sf::Sprite tempDraw = returnSprite(temp);
+            tempDraw.move(pieceSize * i, pieceSize * (7 - j));
+            window->draw(tempDraw);
         }
+    }
 }
 
 
@@ -86,7 +87,10 @@ void GameGraphics::getLegalMoves(Position* const pos)
     {
         for (int file {0}; file < 8; file++)
         {
-            legalMoves[rank][file] = pos->isMoveLegal(firstPos, {rank, file});
+            if (pos->isProperPieceMove(firstPos, {rank, file}))
+            {
+                legalMoves[rank][file] = pos->isMoveLegal(firstPos, {rank, file});
+            }
         }
     }
 }
@@ -328,10 +332,12 @@ void GameGraphics::setScale()
     blackKing.setScale(scale, scale);
 
     picked.setSize(sf::Vector2f(scale * chessboardSize, scale * chessboardSize));
-    legalMove.setRadius(scale * 150.f);
+    checkmate.setSize({board.width, board.width});
 
-    circleOffset = 0.125 * 400 - 150.f * 0.125;
+    float radius {150.f};
+    legalMove.setRadius(scale * radius);
 
+    circleOffset = (400 - radius) * scale;
 }
 
 
@@ -343,11 +349,15 @@ GameGraphics::GameGraphics()
         return;
     }
 
-    picked.setPosition(800.f, 800.f);
-    picked.setFillColor(sf::Color::Green);
+    sf::Color highlighter {0,200,0,150};
 
-    legalMove.setPosition(300.f, 300.f);
-    legalMove.setFillColor(sf::Color(0,200,0,150));
+    checkmate.setFillColor({150, 150, 150, 150});
+    checkmate.setPosition(0.f, 0.f);
+
+    picked.setPosition(800.f, 800.f);
+    picked.setFillColor(highlighter);
+
+    legalMove.setFillColor(highlighter);
 
     setTextures();
     setScale();

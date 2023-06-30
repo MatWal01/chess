@@ -8,11 +8,9 @@
 int main()
 {
     GameGraphics ui;
-    Position curr;      // turn this into a pointer in the future
+    Position curr {"7k/8/8/8/8/8/8/6QK w - - 0 1"};      // turn this into a pointer in the future
     ui.loadGameTextures();
     ui.setTextures();
-    curr.setPosition("rnbq1bnr/pppppppp/8/3k4/3K4/8/PPPPPPPP/RNBQ1BNR w KQkq - 0 1");
-
 
     sf::RenderWindow window(sf::VideoMode(ui.WWIDTH, ui.WHEIGHT), "Chess", sf::Style::Close);
 
@@ -30,6 +28,7 @@ int main()
             if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
             {
                 ui.resetPicked();
+                std::cout << curr.returnFEN() << std::endl;
             }
 
             if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
@@ -41,6 +40,11 @@ int main()
         window.draw(ui.picked);
         ui.drawPosition(&window, &curr);
         ui.drawLegalMoves(&window, &curr);
+        if (curr.end)
+        {
+            window.draw(ui.checkmate);
+        }
+
         window.display();
         window.clear();
     }
