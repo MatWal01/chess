@@ -8,7 +8,7 @@
 int main()
 {
     GameGraphics ui;
-    Position curr {"7k/8/8/8/8/8/8/6QK w - - 0 1"};      // turn this into a pointer in the future
+    Position curr {};      // turn this into a pointer in the future
     ui.loadGameTextures();
     ui.setTextures();
 
