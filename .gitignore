@@ -1,4 +1,2 @@
-/main.exe
-/main.o
-/interface.o
-/gamelogic.o
+*.exe
+*.o
