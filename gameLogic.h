@@ -21,7 +21,7 @@ public:
     size_t halfmoves {0};
 
     char onMove {'W'};
-    std::string enpassant;
+    std::string enpassant {"-"};
     std::string FEN;
 
     std::unique_ptr<Position> prev;

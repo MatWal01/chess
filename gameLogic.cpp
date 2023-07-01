@@ -10,18 +10,18 @@ bool Position::isMoveLegal(piecePos curr, piecePos next)
         return false;
     }
 
-    // check if correct piece colour was chosen
-    if (!(islower(onMove) == islower(pieces.at(curr.rank).at(curr.file))))
-    {
-        return false;
-    }
-
     // check if any given rank/file is within the chessboard bounds
     if (!isInBoardBounds(curr))
     {
         return false;
     }
     else if (!isInBoardBounds(next))
+    {
+        return false;
+    }    
+
+    // check if correct piece colour was chosen
+    if (!(islower(onMove) == islower(pieces.at(curr.rank).at(curr.file))))
     {
         return false;
     }
@@ -77,9 +77,9 @@ bool Position::isProperPieceMove(piecePos curr, piecePos next)
                 }
                 // check for en passant
                 // holy hell
-                else if (!enpassant.empty())
+                else if (enpassant != "-")
                 {
-                    piecePos enpassantPos {enpassant.at(1) - '1', enpassant.at(0) - 'A'};
+                    piecePos enpassantPos {enpassant.at(1) - '1', enpassant.at(0) - 'a'};
                     if (
                         (enpassantPos.rank == next.rank && enpassantPos.file == next.file)
                         &&
@@ -128,9 +128,9 @@ bool Position::isProperPieceMove(piecePos curr, piecePos next)
                 }
                 // check for en passant
                 // holy hell
-                else if (!enpassant.empty())
+                else if (enpassant != "-")
                 {
-                    piecePos enpassantPos {enpassant.at(1) - '1', enpassant.at(0) - 'A'};
+                    piecePos enpassantPos {enpassant.at(1) - '1', enpassant.at(0) - 'a'};
                     if (
                         (enpassantPos.rank == next.rank && enpassantPos.file == next.file)
                         &&
@@ -589,9 +589,9 @@ bool Position::movePiece(piecePos curr, piecePos next)
     // enpassant
     if (onMove == 'W')
     {
-        if (!enpassant.empty())
+        if (enpassant != "-")
         {
-            piecePos enpassantPos {enpassant.at(1) - '1', enpassant.at(0) - 'A'};
+            piecePos enpassantPos {enpassant.at(1) - '1', enpassant.at(0) - 'a'};
             if (
                 (enpassantPos.rank == next.rank && enpassantPos.file == next.file)
                 &&
@@ -604,9 +604,9 @@ bool Position::movePiece(piecePos curr, piecePos next)
     }
     else
     {
-        if (!enpassant.empty())
+        if (enpassant != "-")
         {
-            piecePos enpassantPos {enpassant.at(1) - '1', enpassant.at(0) - 'A'};
+            piecePos enpassantPos {enpassant.at(1) - '1', enpassant.at(0) - 'a'};
             if (
                 (enpassantPos.rank == next.rank && enpassantPos.file == next.file)
                 &&
@@ -619,20 +619,27 @@ bool Position::movePiece(piecePos curr, piecePos next)
     }
 
     // note pawn move by 2 squares
+    // TODO: note only if enpassant can happen in the next move
     enpassant.clear();
     if (tolower(temp) == 'p')
     {
         if (curr.rank - next.rank == -2)
         {
-            enpassant.push_back('A' + curr.file);
+            enpassant.push_back('a' + curr.file);
             enpassant.push_back('3');
         }
         else if (curr.rank - next.rank == 2)
         {
-            enpassant.push_back('A' + curr.file);
+            enpassant.push_back('a' + curr.file);
             enpassant.push_back('6');
         }
     }
+
+    if (enpassant.empty())
+    {
+        enpassant = "-";
+    }
+
 
     pieces.at(curr.rank).at(curr.file) ='\0';
     pieces.at(next.rank).at(next.file) = temp;
@@ -1047,6 +1054,8 @@ std::string Position::returnFEN()
 
     FEN += ' ';
 
+    FEN += enpassant;
+
     return FEN;
 }
 
@@ -1090,7 +1099,7 @@ void Position::setPosition(std::string FEN)
     }
     // skip whitespace
     charCounter++;
-    
+
     if (FEN.at(charCounter) == 'w')
     {
         onMove = 'W';
@@ -1099,20 +1108,21 @@ void Position::setPosition(std::string FEN)
     {
         onMove = 'b';
     }
-    charCounter + 2;
 
-    // bug here, doesnt work
-    if (FEN.at(charCounter) == '-')
-    {
-        wKingside = false;
-        wQueenside = false;
-        bKingside = false;
-        bQueenside = false;
-        charCounter++;
-    }
+    charCounter += 2;
 
     while (FEN.at(charCounter) != ' ')
     {
+        if (FEN.at(charCounter) == '-')
+        {
+            wKingside = false;
+            wQueenside = false;
+            bKingside = false;
+            bQueenside = false;
+            charCounter++;
+            break;
+        }
+
         if (FEN.at(charCounter) == 'K')
         {
             wKingside = true;
@@ -1132,6 +1142,7 @@ void Position::setPosition(std::string FEN)
 
         charCounter++;
     }
+    
     charCounter++;
     // TODO: enpassant move
     // TODO: halfmoves counter
