@@ -1,5 +1,5 @@
 #include <iostream>
-#include <random>
+#include <memory>
 #include <SFML/Graphics.hpp>
 #include "gameLogic.h"
 #include "interface.h"
@@ -8,7 +8,8 @@
 int main()
 {
     GameGraphics ui;
-    Position curr {};      // turn this into a pointer in the future
+    Position curr {};       // turn this into a pointer in the future
+                            // "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     ui.loadGameTextures();
     ui.setTextures();
 
