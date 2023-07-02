@@ -16,19 +16,19 @@ struct piecePos
 class Position
 {
 public:
-
     size_t moves {0};
     size_t halfmoves {0};
 
     char onMove {'W'};
     std::string enpassant {"-"};
+    std::string moveNotation;
     std::string FEN;
 
     std::unique_ptr<Position> prev;
     std::unique_ptr<Position> next;
 
     // castle rights kingside and queenside
-    bool wKingside {false};
+    bool wKingside {false}; 
     bool wQueenside {false};
     bool bKingside {false};
     bool bQueenside {false};
@@ -50,15 +50,20 @@ private:
     bool isInCheck();
     bool areLegalMovesLeft();
     bool isInBoardBounds(piecePos curr);
+    bool legalEnpassant(piecePos curr, piecePos next);
     bool invalidRookMove(piecePos curr, piecePos next);
     bool invalidDiagonalMove(piecePos curr, piecePos next);
+    bool legalCastle(piecePos curr, piecePos next);
 public:
-    bool isInCheck(piecePos curr, piecePos next);
     bool isMoveLegal(piecePos curr, piecePos next);
+    bool isInCheck(piecePos curr, piecePos next);
     bool isProperPieceMove(piecePos curr, piecePos next);
     bool movePiece(piecePos curr, piecePos next);
-    void setPosition(std::string FEN);
+    
+    std::string moveToAlgebraicNotation(piecePos curr, piecePos next);
     std::string returnFEN();
+    void setPosition(std::string FEN);
+
     Position(std::string FEN);
     Position();
     Position(Position* const prev, piecePos curr, piecePos next);
