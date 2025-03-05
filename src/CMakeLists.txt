@@ -13,11 +13,11 @@ FetchContent_Declare(SFML
     SYSTEM)
 FetchContent_MakeAvailable(SFML)
 
-add_executable(chess src/main.cpp src/interface.cpp src/gameLogic.cpp src/fen.cpp)
-target_link_libraries(chess PRIVATE sfml-graphics)
+add_executable(chess main.cpp interface.cpp gameLogic.cpp fen.cpp)
 target_compile_features(chess PRIVATE cxx_std_17)
+target_link_libraries(chess PRIVATE sfml-graphics)
 
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/textures
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/textures
         DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/bin/)
 
 if(WIN32)
