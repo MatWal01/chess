@@ -1,9 +1,26 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
+#include <array>
 #include <string>
 #include "gameLogic.h"
 #ifndef _INTERFACE_H_
 #define _INTERFACE_H_
+
+enum PiecesInArray
+{
+    wPawn = 0,
+    wRook,
+    wKnight,
+    wBishop,
+    wQueen,
+    wKing,
+    bPawn,
+    bRook,
+    bKnight,
+    bBishop,
+    bQueen,
+    bKing
+};
 
 
 class GameGraphics
@@ -12,41 +29,12 @@ private:
     sf::Texture chessboardTexture;
 
     // textures
-    // white pieces
-    sf::Texture whitePawnTexture;
-    sf::Texture whiteRookTexture;
-    sf::Texture whiteKnightTexture;
-    sf::Texture whiteBishopTexture;
-    sf::Texture whiteQueenTexture;
-    sf::Texture whiteKingTexture;
-
-    // black pieces
-    sf::Texture blackPawnTexture;
-    sf::Texture blackRookTexture;
-    sf::Texture blackKnightTexture;
-    sf::Texture blackBishopTexture;
-    sf::Texture blackQueenTexture;
-    sf::Texture blackKingTexture;
+    std::array<sf::Texture, 12> piecesTextures;
 
 public:    
     // sprites
     sf::Sprite chessboard;
-
-    // white pieces
-    sf::Sprite whitePawn;
-    sf::Sprite whiteRook;
-    sf::Sprite whiteKnight;
-    sf::Sprite whiteBishop;
-    sf::Sprite whiteQueen;
-    sf::Sprite whiteKing;
-
-    // black pieces
-    sf::Sprite blackPawn;
-    sf::Sprite blackRook;
-    sf::Sprite blackKnight;
-    sf::Sprite blackBishop;
-    sf::Sprite blackQueen;
-    sf::Sprite blackKing;
+    std::array<sf::Sprite, 12> piecesSprites;
 
     sf::CircleShape legalMove;
     bool legalMoves[8][8] {false};  //[rank][file]
@@ -74,12 +62,11 @@ public:
 
     void leftMouseInteract(sf::RenderWindow* const window, Position* const curr);
     void resetPicked();
-    void drawChessboard(sf::RenderWindow* const window) const;
     void drawPosition(sf::RenderWindow* const window, Position* const pos);
     void getLegalMoves(Position* const pos);
     void resetLegalMoves();
     void drawLegalMoves(sf::RenderWindow* const window, Position* const pos);
-    sf::Sprite returnSprite(char piece);
+    sf::Sprite returnSprite(char temp);
     sf::Sprite* shareSprite(char temp);
     bool loadGameTextures();
     void setTextures();

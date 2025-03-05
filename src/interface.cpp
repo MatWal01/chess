@@ -55,15 +55,10 @@ void GameGraphics::resetPicked()
 }
 
 
-
-void GameGraphics::drawChessboard(sf::RenderWindow* const window) const
-{
-    window->draw(chessboard);
-}
-
-
 void GameGraphics::drawPosition(sf::RenderWindow* const window, Position* const pos)
 {
+    window->draw(chessboard);
+    window->draw(this->picked);
     for (int i {7}; i >= 0; i--)
     {
         for (size_t j {0}; j < 8; j++)
@@ -121,149 +116,161 @@ void GameGraphics::drawLegalMoves(sf::RenderWindow* const window, Position* cons
             }
         }
     }
+
+    if (pos->end)
+    {
+        window->draw(checkmate);
+    }
 }
 
 
-sf::Sprite GameGraphics::returnSprite(char piece)
+sf::Sprite GameGraphics::returnSprite(char temp)
 {
-    switch (piece)
-    {        
+    int piece {0};        
+    switch (temp)
+    {
         // white pieces
         case 'P':
-            return whitePawn;
+            piece = wPawn;
+            break;
         case 'R':
-            return whiteRook;
+            piece = wRook;
+            break;
         case 'N':
-            return whiteKnight;
+            piece = wKnight;
+            break;
         case 'B':
-            return whiteBishop;
+            piece = wBishop;
+            break;
         case 'Q':
-            return whiteQueen;
+            piece = wQueen;
+            break;
         case 'K':
-            return whiteKing;
+            piece = wKing;
+            break;
         
         // black pieces
         case 'p':
-            return blackPawn;
+            piece = bPawn;
+            break;
         case 'r':
-            return blackRook;
+            piece = bRook;
+            break;
         case 'n':
-            return blackKnight;
+            piece = bKnight;
+            break;
         case 'b':
-            return blackBishop;
+            piece = bBishop;
+            break;
         case 'q':
-            return blackQueen;
+            piece = bQueen;
+            break;
         case 'k':
-            return blackKing;
+            piece = bKing;
+            break;
         
         // no piece
         case '\0':
-            return whiteKing;
+            piece = wKing;
+            break;
         default:
-            return blackKing;
+            piece = bKing;
+            break;
+        }
 
-    }
+    return piecesSprites.at(piece);
 }
 
 
 sf::Sprite* GameGraphics::shareSprite(char temp)
 {
+    int piece = wKing;        
     switch (temp)
-    {        
+    {
         // white pieces
         case 'P':
-            return &whitePawn;
+            piece = wPawn;
+            break;
         case 'R':
-            return &whiteRook;
+            piece = wRook;
+            break;
         case 'N':
-            return &whiteKnight;
+            piece = wKnight;
+            break;
         case 'B':
-            return &whiteBishop;
+            piece = wBishop;
+            break;
         case 'Q':
-            return &whiteQueen;
+            piece = wQueen;
+            break;
         case 'K':
-            return &whiteKing;
+            piece = wKing;
+            break;
         
         // black pieces
         case 'p':
-            return &blackPawn;
+            piece = bPawn;
+            break;
         case 'r':
-            return &blackRook;
+            piece = bRook;
+            break;
         case 'n':
-            return &blackKnight;
+            piece = bKnight;
+            break;
         case 'b':
-            return &blackBishop;
+            piece = bBishop;
+            break;
         case 'q':
-            return &blackQueen;
+            piece = bQueen;
+            break;
         case 'k':
-            return &blackKing;
+            piece = bKing;
+            break;
         
         // no piece
         case '\0':
-            return &whiteKing;
+            piece = wKing;
+            break;
         default:
-            return &blackKing;
+            piece = bKing;
+            break;
+        }
 
-    }
+    return &piecesSprites.at(piece);
 }
 
 
 bool GameGraphics::loadGameTextures()
 {
+    std::string textureDir {"textures/"};
+    std::array<std::string, 12> pieceTexture 
+    {
+        "wPawn.png",
+        "wRook.png",
+        "wKnight.png",
+        "wBishop.png",
+        "wQueen.png",
+        "wKing.png",
+        "bPawn.png",
+        "bRook.png",
+        "bKnight.png",
+        "bBishop.png",
+        "bQueen.png",
+        "bKing.png"
+    };
+
     if (!chessboardTexture.loadFromFile("textures/chessboard.png"))
     {
         return false;
     }
-    // white pieces
-    if (!whitePawnTexture.loadFromFile("textures/wPawn.png"))
-    {
-        return false;
-    }
-    if (!whiteRookTexture.loadFromFile("textures/wRook.png"))
-    {
-        return false;
-    }
-    if (!whiteKnightTexture.loadFromFile("textures/wKnight.png"))
-    {
-        return false;
-    }
-    if (!whiteBishopTexture.loadFromFile("textures/wBishop.png"))
-    {
-        return false;
-    }
-    if (!whiteQueenTexture.loadFromFile("textures/wQueen.png"))
-    {
-        return false;
-    }
-    if (!whiteKingTexture.loadFromFile("textures/wKing.png"))
-    {
-        return false;
-    }
 
-    // black pieces
-    if (!blackPawnTexture.loadFromFile("textures/bPawn.png"))
+    for (size_t i {0}; i < piecesTextures.size(); i++)
     {
-        return false;
-    }
-    if (!blackRookTexture.loadFromFile("textures/bRook.png"))
-    {
-        return false;
-    }
-    if (!blackKnightTexture.loadFromFile("textures/bKnight.png"))
-    {
-        return false;
-    }
-    if (!blackBishopTexture.loadFromFile("textures/bBishop.png"))
-    {
-        return false;
-    }
-    if (!blackQueenTexture.loadFromFile("textures/bQueen.png"))
-    {
-        return false;
-    }
-    if (!blackKingTexture.loadFromFile("textures/bKing.png"))
-    {
-        return false;
+        if (!piecesTextures.at(i).loadFromFile(textureDir + pieceTexture.at(i)))
+        {
+            std::cerr << "Failed to load a texture " << (textureDir + pieceTexture.at(i)) << std::endl;
+            return false;
+        }
     }
     
     return true;
@@ -272,64 +279,35 @@ bool GameGraphics::loadGameTextures()
 
 void GameGraphics::setTextures()
 {
-
-    whitePawnTexture.setSmooth(true);
-    whiteRookTexture.setSmooth(true);
-    whiteKnightTexture.setSmooth(true);
-    whiteBishopTexture.setSmooth(true);
-    whiteQueenTexture.setSmooth(true);
-    whiteKingTexture.setSmooth(true);
-    
-    blackPawnTexture.setSmooth(true);
-    blackRookTexture.setSmooth(true);
-    blackKnightTexture.setSmooth(true);
-    blackBishopTexture.setSmooth(true);
-    blackQueenTexture.setSmooth(true);
-    blackKingTexture.setSmooth(true);
+    for (size_t i {0}; i < piecesTextures.size(); i++)
+    {
+        piecesTextures.at(i).setSmooth(true);
+    }
 
     chessboard.setTexture(chessboardTexture);
 
-    whitePawn.setTexture(whitePawnTexture);
-    whiteRook.setTexture(whiteRookTexture);
-    whiteKnight.setTexture(whiteKnightTexture);
-    whiteBishop.setTexture(whiteBishopTexture);
-    whiteQueen.setTexture(whiteQueenTexture);
-    whiteKing.setTexture(whiteKingTexture);
-    
-    blackPawn.setTexture(blackPawnTexture);
-    blackRook.setTexture(blackRookTexture);
-    blackKnight.setTexture(blackKnightTexture);
-    blackBishop.setTexture(blackBishopTexture);
-    blackQueen.setTexture(blackQueenTexture);
-    blackKing.setTexture(blackKingTexture);
+    for (size_t i {0}; i < piecesSprites.size(); i++)
+    {
+        piecesSprites.at(i).setTexture(piecesTextures.at(i));
+    }
 }
-
 
 void GameGraphics::setScale()
 {
     sf::FloatRect board = chessboard.getGlobalBounds();
     
     // I assume all pieces files have the same resolution and are squares
-    sf::FloatRect piece = blackRook.getGlobalBounds();
+    sf::FloatRect piece = piecesSprites.at(0).getGlobalBounds();
     chessboardSize = board.width;
     float scale = (board.width / 8.0) / piece.width;
     
-    // hopefully all pieces are the same
+    // hopefully all pieces are the same size
     pieceSize = piece.width * scale;
 
-    whitePawn.setScale(scale, scale);
-    whiteRook.setScale(scale, scale);
-    whiteKnight.setScale(scale, scale);
-    whiteBishop.setScale(scale, scale);
-    whiteQueen.setScale(scale, scale);
-    whiteKing.setScale(scale, scale);
-    
-    blackPawn.setScale(scale, scale);
-    blackRook.setScale(scale, scale);
-    blackKnight.setScale(scale, scale);
-    blackBishop.setScale(scale, scale);
-    blackQueen.setScale(scale, scale);
-    blackKing.setScale(scale, scale);
+    for (size_t i {0}; i < piecesSprites.size(); i++)
+    {
+        piecesSprites.at(i).setScale(scale, scale);
+    }
 
     picked.setSize(sf::Vector2f(scale * chessboardSize, scale * chessboardSize));
     checkmate.setSize({board.width, board.width});
