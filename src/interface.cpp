@@ -54,28 +54,31 @@ void GameGraphics::resetPicked()
     resetLegalMoves();
 }
 
-
-
 void GameGraphics::drawChessboard(sf::RenderWindow* const window) const
 {
     window->draw(chessboard);
 }
 
-
 void GameGraphics::drawPosition(sf::RenderWindow* const window, Position* const pos)
 {
-    for (int i {7}; i >= 0; i--)
+    drawChessboard(window);
+
+    bitboard temp {1};
+    sf::Sprite* tempDraw;
+
+    // for all pieces white and black
+    for (size_t index {0}; index < 12; index++)
     {
-        for (size_t j {0}; j < 8; j++)
+        tempDraw = shareSprite(index);
+        // for all squares
+        for (size_t i {0}; i < 64; i++)
         {
-            char temp = pos->pieces.at(j).at(i);
-            if (temp == '\0')
+            // if piece is at given square
+            if (pos->pieces.at(index) & (temp << i))
             {
-                continue;
+                tempDraw->setPosition(pieceSize * (i % 8), pieceSize * (7 - (i / 8)));
+                window->draw(*tempDraw);
             }
-            sf::Sprite tempDraw = returnSprite(temp);
-            tempDraw.move(pieceSize * i, pieceSize * (7 - j));
-            window->draw(tempDraw);
         }
     }
 }
@@ -166,40 +169,40 @@ sf::Sprite GameGraphics::returnSprite(char piece)
 }
 
 
-sf::Sprite* GameGraphics::shareSprite(char temp)
+sf::Sprite* GameGraphics::shareSprite(size_t temp)
 {
     switch (temp)
     {        
         // white pieces
-        case 'P':
+        case 0:
             return &whitePawn;
-        case 'R':
+        case 1:
             return &whiteRook;
-        case 'N':
+        case 2:
             return &whiteKnight;
-        case 'B':
+        case 3:
             return &whiteBishop;
-        case 'Q':
+        case 4:
             return &whiteQueen;
-        case 'K':
+        case 5:
             return &whiteKing;
         
         // black pieces
-        case 'p':
+        case 6:
             return &blackPawn;
-        case 'r':
+        case 7:
             return &blackRook;
-        case 'n':
+        case 8:
             return &blackKnight;
-        case 'b':
+        case 9:
             return &blackBishop;
-        case 'q':
+        case 10:
             return &blackQueen;
-        case 'k':
+        case 11:
             return &blackKing;
         
         // no piece
-        case '\0':
+        case 12:
             return &whiteKing;
         default:
             return &blackKing;

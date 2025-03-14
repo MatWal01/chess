@@ -8,7 +8,7 @@
 int main()
 {
     GameGraphics ui;
-    Position curr;       // turn this into a pointer in the future
+    Position curr;          // turn this into a pointer in the future
                             // "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
     sf::ContextSettings settings;

@@ -80,7 +80,7 @@ public:
     void resetLegalMoves();
     void drawLegalMoves(sf::RenderWindow* const window, Position* const pos);
     sf::Sprite returnSprite(char piece);
-    sf::Sprite* shareSprite(char temp);
+    sf::Sprite* shareSprite(size_t temp);
     bool loadGameTextures();
     void setTextures();
     void setScale();

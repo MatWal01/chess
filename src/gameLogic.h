@@ -1,11 +1,13 @@
 #ifndef _GAMELOGIC_H_
 #define _GAMELOGIC_H_
 #include <string>
+#include <array>
 #include <vector>
 #include <memory>
+#include <cstdint>
 #include <SFML/Graphics.hpp>
-// if i #include "interface.h" everything falls apart
 
+typedef std::uint64_t bitboard;
 
 struct piecePos
 {
@@ -35,16 +37,21 @@ public:
 
     bool end {false};
     
-    std::vector<std::vector<char>> pieces {
-        {'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'},
-        {'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'},
-        {'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'},
-        {'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'},
-        {'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'},
-        {'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'},
-        {'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'},
-        {'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'}
-        };
+    std::array<bitboard, 12> pieces
+    {
+        0x000000000000FF00, // white pawn
+        0x0000000000000081, // R
+        0x0000000000000042, // N
+        0x0000000000000024, // B
+        0x0000000000000008, // Q
+        0x0000000000000010, // K
+        0x00FF000000000000, // black pawn
+        0x8100000000000000, // ...
+        0x4200000000000000,
+        0x2400000000000000,
+        0x0800000000000000,
+        0x1000000000000000
+    };
 
 private:
     bool isInCheck();
@@ -60,13 +67,13 @@ public:
     bool isProperPieceMove(piecePos curr, piecePos next);
     bool movePiece(piecePos curr, piecePos next);
     
-    std::string moveToAlgebraicNotation(piecePos curr, piecePos next);
+    // std::string moveToAlgebraicNotation(piecePos curr, piecePos next);
     std::string returnFEN();
     void setPosition(std::string FEN);
 
-    Position(std::string FEN);
-    Position();
-    Position(Position* const prev, piecePos curr, piecePos next);
+    // Position(std::string FEN);
+    // Position();
+    // Position(Position* const prev, piecePos curr, piecePos next);
 };
 
 #endif
