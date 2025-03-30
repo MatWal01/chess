@@ -18,7 +18,7 @@ int main()
     
     while (window.isOpen())
     {
-        ui.drawChessboard(&window);
+        ui.drawPosition(&window, &curr);
         ui.mouse = sf::Mouse::getPosition(window);
         sf::Event event;
         while (window.pollEvent(event))
@@ -38,8 +38,6 @@ int main()
             }
         }
 
-        window.draw(ui.picked);
-        ui.drawPosition(&window, &curr);
         ui.drawLegalMoves(&window, &curr);
         if (curr.end)
         {
