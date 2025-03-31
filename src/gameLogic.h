@@ -9,10 +9,30 @@
 
 typedef std::uint64_t bitboard;
 
-struct piecePos
+enum class Pieces
 {
-    int rank;
-    int file;
+    wPawn = 0,
+    wRook,
+    wKnight,
+    wBishop,
+    wQueen,
+    wKing,
+    bPawn,
+    bRook,
+    bKnight,
+    bBishop,
+    bQueen,
+    bKing
+};
+
+class PiecePos
+{
+public:
+    int rank; // 1, ... (1st rank is 0)
+    int file; // A, ...
+
+    bitboard returnBitboard();
+    bool isInBoardBounds();
 };
 
 class Position
@@ -52,20 +72,20 @@ public:
         0x0800000000000000,
         0x1000000000000000
     };
+    bitboard enpassantSquare {0};
 
 private:
     bool isInCheck();
     bool areLegalMovesLeft();
-    bool isInBoardBounds(piecePos curr);
-    bool legalEnpassant(piecePos curr, piecePos next);
-    bool invalidRookMove(piecePos curr, piecePos next);
-    bool invalidDiagonalMove(piecePos curr, piecePos next);
-    bool legalCastle(piecePos curr, piecePos next);
+    bool legalEnpassant(PiecePos curr, PiecePos next);
+    bool invalidRookMove(PiecePos curr, PiecePos next);
+    bool invalidKnightMove(PiecePos curr, PiecePos next);
+    bool invalidBishopMove(PiecePos curr, PiecePos next);
+    bool legalCastle(PiecePos curr, PiecePos next);
 public:
-    bool isMoveLegal(piecePos curr, piecePos next);
-    bool isInCheck(piecePos curr, piecePos next);
-    bool isProperPieceMove(piecePos curr, piecePos next);
-    bool movePiece(piecePos curr, piecePos next);
+    bool isMoveLegal(PiecePos curr, PiecePos next);
+    bool isProperPieceMove(PiecePos curr, PiecePos next);
+    bool movePiece(PiecePos curr, PiecePos next);
     
     // std::string moveToAlgebraicNotation(piecePos curr, piecePos next);
     std::string returnFEN();
@@ -75,5 +95,9 @@ public:
     // Position();
     // Position(Position* const prev, piecePos curr, piecePos next);
 };
+
+
+size_t binaryHammingWeight(std::uint64_t in);
+PiecePos bitboardToPiecePos(bitboard piece);
 
 #endif

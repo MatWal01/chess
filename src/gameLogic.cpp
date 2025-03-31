@@ -3,246 +3,49 @@
 #include "interface.h"
 
 
+bool PiecePos::isInBoardBounds()
+{
+    if (rank > 7 || rank < 0)
+    {
+        return false;
+    }
+    else if (file > 7 || file < 0)
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
+}
+
+// returns a bitboard with a single piece on it
+bitboard PiecePos::returnBitboard()
+{
+    bitboard temp {1};
+    temp <<= (file) + (rank) * 8;
+    return temp;
+}
+
 // TODO
 bool Position::isInCheck()
 {
-    // char tempKing {'\0'};
-    // char oppositeKing {'\0'};
-    // char oppositeQueen {'\0'};
-    // char oppositeRook {'\0'};
-    // char oppositeBishop {'\0'};
-    // char oppositeKnight {'\0'};
+    // no king on the board
+    if (
+        !(pieces.at(static_cast<int>(Pieces::wKing)))
+        ||
+        !(pieces.at(static_cast<int>(Pieces::bKing)))
+        )
+    {
+        return false;
+    }
 
-    // if (onMove == 'W')
-    // {
-    //     tempKing = 'K';
-    //     oppositeKing = 'k';
-    //     oppositeQueen = 'q';
-    //     oppositeRook = 'r';
-    //     oppositeBishop = 'b';
-    //     oppositeKnight = 'n';
-    // }
-    // else
-    // {
-    //     tempKing = 'k';
-    //     oppositeKing = 'K';
-    //     oppositeQueen = 'Q';
-    //     oppositeRook = 'R';
-    //     oppositeBishop = 'B';
-    //     oppositeKnight = 'N';
-    // }
-
-    // piecePos kingPosition {-1, -1};
-    // piecePos oppositeKingPosition {-1, -1};
-
-    // // find King
-    // for (int rank {0}; rank < 8; rank++)
-    // {
-    //     for (int file {0}; file < 8; file++)
-    //     {
-    //         if (pieces.at(rank).at(file) == tempKing)
-    //         {
-    //             kingPosition.rank = rank;
-    //             kingPosition.file = file;
-    //         }
-    //         else if(pieces.at(rank).at(file) == oppositeKing)
-    //         {
-    //             oppositeKingPosition.rank = rank;
-    //             oppositeKingPosition.file = file;
-    //         }
-
-    //     }
-    // }
-
-    // // no king on the board
-    // if (
-    //     (kingPosition.rank < 0 || kingPosition.file < 0)
-    //     ||
-    //     (oppositeKingPosition.rank < 0 || oppositeKingPosition.file < 0)
-    //     )
-    // {
-    //     return false;
-    // }
-
-    // // check for queens
-    // // check for rooks
-    // char temp {'\0'};
-    // for (int rank {0}; rank < 8; rank++)
-    // {
-    //     temp = pieces.at(rank).at(kingPosition.file);
-    //     if (
-    //         (temp == oppositeRook || temp == oppositeQueen)
-    //         &&
-    //         !invalidRookMove(kingPosition,{rank, kingPosition.file})
-    //         )
-    //     {
-    //         return true;
-    //     }
-    // }
-
-    // for (int file {0}; file < 8; file++)
-    // {
-    //     temp = pieces.at(kingPosition.rank).at(file);
-    //     if (
-    //         (temp == oppositeRook || temp == oppositeQueen)
-    //         &&
-    //         !invalidRookMove(kingPosition,{kingPosition.rank, file})
-    //         )
-    //     {
-    //         return true;
-    //     }
-    // }
-
-
-    // // check for bishops
-    // for (int i {0}, j {0}; isInBoardBounds({kingPosition.rank + i, kingPosition.file + j}); i++, j++)
-    // {
-    //     temp = pieces.at(kingPosition.rank + i).at(kingPosition.file + j);
-    //     if (temp == oppositeBishop || temp == oppositeQueen)
-    //     {
-    //         if (!invalidDiagonalMove(kingPosition, {kingPosition.rank + i, kingPosition.file + j}))
-    //         {
-    //             return true;
-    //         }
-    //     }
-    // }
-
-    // for (int i {0}, j {0}; isInBoardBounds({kingPosition.rank + i, kingPosition.file + j}); i++, j--)
-    // {
-    //     temp = pieces.at(kingPosition.rank + i).at(kingPosition.file + j);
-    //     if (temp == oppositeBishop || temp == oppositeQueen)
-    //     {
-    //         if (!invalidDiagonalMove(kingPosition, {kingPosition.rank + i, kingPosition.file + j}))
-    //         {
-    //             return true;
-    //         }
-    //     }
-    // }
-
-    // for (int i {0}, j {0}; isInBoardBounds({kingPosition.rank + i, kingPosition.file + j}); i--, j++)
-    // {
-    //     temp = pieces.at(kingPosition.rank + i).at(kingPosition.file + j);
-    //     if (temp == oppositeBishop || temp == oppositeQueen)
-    //     {
-    //         if (!invalidDiagonalMove(kingPosition, {kingPosition.rank + i, kingPosition.file + j}))
-    //         {
-    //             return true;
-    //         }
-    //     }
-    // }
-
-    // for (int i {0}, j {0}; isInBoardBounds({kingPosition.rank + i, kingPosition.file + j}); i--, j--)
-    // {
-    //     temp = pieces.at(kingPosition.rank + i).at(kingPosition.file + j);
-    //     if (temp == oppositeBishop || temp == oppositeQueen)
-    //     {
-    //         if (!invalidDiagonalMove(kingPosition, {kingPosition.rank + i, kingPosition.file + j}))
-    //         {
-    //             return true;
-    //         }
-    //     }
-    // }
-
-    // // check for knights
-    // std::vector<piecePos> knightMoves;
-    // knightMoves.push_back({kingPosition.rank + 2, kingPosition.file + 1});
-    // knightMoves.push_back({kingPosition.rank + 2, kingPosition.file - 1});
-    // knightMoves.push_back({kingPosition.rank - 2, kingPosition.file + 1});
-    // knightMoves.push_back({kingPosition.rank - 2, kingPosition.file - 1});
-    // knightMoves.push_back({kingPosition.rank + 1, kingPosition.file + 2});
-    // knightMoves.push_back({kingPosition.rank + 1, kingPosition.file - 2});
-    // knightMoves.push_back({kingPosition.rank - 1, kingPosition.file + 2});
-    // knightMoves.push_back({kingPosition.rank - 1, kingPosition.file - 2});
-
-    // for (int i {0}; i < knightMoves.size(); i++)
-    // {
-    //     if (isInBoardBounds(knightMoves.at(i)))
-    //     {
-    //         if (pieces.at(knightMoves.at(i).rank).at(knightMoves.at(i).file) == oppositeKnight)
-    //         {
-    //             return true;
-    //         }
-    //     }
-    // }
-
-    // // check for pawns
-    // // white side
-    // if (onMove == 'W')
-    // {
-    //     if (isInBoardBounds({kingPosition.rank + 1, kingPosition.file + 1}))
-    //     {
-    //         if (pieces.at(kingPosition.rank + 1).at(kingPosition.file + 1) == 'p')
-    //         {
-    //             return true;
-    //         }
-    //     }
-
-    //     if (isInBoardBounds({kingPosition.rank + 1, kingPosition.file - 1}))
-    //     {
-    //         if (pieces.at(kingPosition.rank + 1).at(kingPosition.file - 1) == 'p')
-    //         {
-    //             return true;
-    //         }
-    //     }        
-    // }
-    // // black side
-    // if (onMove == 'b')
-    // {
-    //     if (isInBoardBounds({kingPosition.rank - 1, kingPosition.file + 1}))
-    //     {
-    //         if (pieces.at(kingPosition.rank - 1).at(kingPosition.file + 1) == 'P')
-    //         {
-    //             return true;
-    //         }
-    //     }
-
-    //     if (isInBoardBounds({kingPosition.rank - 1, kingPosition.file - 1}))
-    //     {
-    //         if (pieces.at(kingPosition.rank - 1).at(kingPosition.file - 1) == 'P')
-    //         {
-    //             return true;
-    //         }
-    //     }        
-    // }
-
-    // // check for kings
-    // for (int i {-1}; i < 2; i++)
-    // {
-    //     for (int j {-1}; j < 2; j++)
-    //     {
-    //         if (isInBoardBounds({kingPosition.rank + i, kingPosition.file + j}))
-    //         {
-    //             if (pieces.at(kingPosition.rank + i).at(kingPosition.file + j) == oppositeKing)
-    //             {
-    //                 return true;
-    //             }
-    //         }
-    //     }
-    // }
+    // TODO:
+    // create a new position as if you had not made a move
+    // if your king can be taken you are in check 
 
     return false;
 }
-
-
-bool Position::isInCheck(piecePos curr, piecePos next)
-{
-//     Position temp;
-//     for (int i {0}; i < 8; i++)
-//     {
-//         for (int j {0}; j < 8; j++)
-//         {
-//             temp.pieces.at(i).at(j) = pieces.at(i).at(j);
-//         }
-//     }
-
-//     // temp.setPosition(FEN);       // doesnt work
-
-//     temp.pieces.at(next.rank).at(next.file) = temp.pieces.at(curr.rank).at(curr.file);
-//     temp.pieces.at(curr.rank).at(curr.file) = '\0';
-//     temp.onMove = onMove;
-
-//     return temp.isInCheck();
-// }
 
 
 // bool Position::areLegalMovesLeft()
@@ -270,246 +73,49 @@ bool Position::isInCheck(piecePos curr, piecePos next)
 //         }
 //     }
 
+//     return false;
+// }
+
+
+bool Position::isProperPieceMove(PiecePos picked, PiecePos target)
+{
+    // check if any given rank/file is within the chessboard bounds
+    if (!picked.isInBoardBounds())
+    {
+        return false;
+    }
+    else if (!target.isInBoardBounds())
+    {
+        return false;
+    }
+
+    size_t pickedIndex {0};
+    if (onMove == 'B')
+    {
+        pickedIndex = 6;
+    }
+
+    bitboard pickedPiece = picked.returnBitboard();
+
+    for (size_t i {0}; i < 6; i++, pickedIndex++)
+    {
+        if (pickedPiece & pieces.at(pickedIndex))
+        {
+            break;
+        }
+    }
+
+    // no pieces at picked square
+    if ((pickedIndex == 12 && onMove == 'B') || (pickedIndex == 6 && (onMove == 'W')))
+    {
+        return false;
+    }
+
     return false;
 }
 
 
-bool Position::isProperPieceMove(piecePos curr, piecePos next)
-{
-//     // check if any given rank/file is within the chessboard bounds
-//     if (!isInBoardBounds(curr))
-//     {
-//         return false;
-//     }
-//     else if (!isInBoardBounds(next))
-//     {
-//         return false;
-//     }
-
-//     char temp = pieces.at(curr.rank).at(curr.file);
-
-//     switch(temp)
-//     {
-//         case '\0':  // check if there is a piece
-//             return false;
-//         case 'p':
-//         {
-//             // check for captures
-//             if ((curr.file == next.file - 1 || curr.file == next.file + 1) && curr.rank == next.rank + 1)
-//             {
-//                 // check if the next square is occupied by black piece
-//                 if (isupper(pieces.at(next.rank).at(next.file)))
-//                 {
-//                     return true;
-//                 }
-//                 // check for en passant
-//                 // holy hell
-//                 else
-//                 {
-//                     return legalEnpassant(curr, next);
-//                 }
-//             }
-
-//             if (pieces.at(next.rank).at(next.file) != '\0')
-//             {
-//                 return false;
-//             }
-
-//             // check for first move (2 squares ahead)
-//             if ((curr.file == next.file && curr.rank == 6) && next.rank == 4)
-//             {
-//                 return !invalidRookMove(curr, {4, curr.file});
-//             }
-//             // check for move 1 square ahead
-//             if (curr.file == next.file && curr.rank == next.rank + 1)
-//             {
-//                 return true;
-//             }
-
-//             return false;
-//         }
-//         case 'P':
-//         {
-//             // check for captures
-//             if ((curr.file == next.file - 1 || curr.file == next.file + 1) && curr.rank == next.rank - 1)
-//             {
-//                 // check if the next square is occupied by black piece
-//                 if (islower(pieces.at(next.rank).at(next.file)))
-//                 {
-//                     return true;
-//                 }
-//                 // check for en passant
-//                 // holy hell
-//                 else
-//                 {
-//                     return legalEnpassant(curr, next);
-//                 }
-//             }
-
-//             if (pieces.at(next.rank).at(next.file) != '\0')
-//             {
-//                 return false;
-//             }
-
-//             // check for first move (2 squares ahead)
-//             if ((curr.file == next.file && curr.rank == 1) && next.rank == 3)
-//             {
-//                 return !invalidRookMove(curr, {3, curr.file});
-//             }
-//             // check for move 1 square ahead
-//             if (curr.file == next.file && curr.rank == next.rank - 1)
-//             {
-//                 return true;
-//             }
-
-//             return false;
-//         }
-//         case 'r':
-//         case 'R':
-//         {
-//             if (invalidRookMove(curr, next))
-//             {
-//                 return false;
-//             }
-//             else
-//             {
-//                 // losing castle rights
-//                 // TODO: why tolower()???
-//                 if (tolower(pieces.at(curr.rank).at(curr.file) == 'r'))
-//                 {
-//                     if (curr.rank == 0 && curr.file == 0)
-//                     {
-//                         wQueenside = false;
-//                     }
-//                     else if (curr.rank == 0 && curr.file == 7)
-//                     {
-//                         wKingside = false;
-//                     }
-//                     else if (curr.rank == 7 && curr.file == 0)
-//                     {
-//                         bQueenside = false;
-//                     }
-//                     else if (curr.rank == 7 && curr.file == 7)
-//                     {
-//                         bKingside = false;
-//                     }
-//                 }
-
-//                 if (tolower(pieces.at(next.rank).at(next.file) == 'r'))
-//                 {
-//                     if (next.rank == 0 && next.file == 0)
-//                     {
-//                         wQueenside = false;
-//                     }
-//                     else if (next.rank == 0 && next.file == 7)
-//                     {
-//                         wKingside = false;
-//                     }
-//                     else if (next.rank == 7 && next.file == 0)
-//                     {
-//                         bQueenside = false;
-//                     }
-//                     else if (next.rank == 7 && next.file == 7)
-//                     {
-//                         bKingside = false;
-//                     }
-//                 }
-
-//                 return true;
-//             }
-//         }
-//         case 'n':
-//         case 'N':
-//         {
-//             if (
-//                 (
-//                 ((curr.file == next.file + 2 && curr.rank == next.rank + 1) || (curr.file == next.file + 2 && curr.rank == next.rank - 1))
-//                 ||
-//                 ((curr.file == next.file - 2 && curr.rank == next.rank + 1) || (curr.file == next.file - 2 && curr.rank == next.rank - 1))
-//                 )
-//                 ||
-//                 (
-//                 ((curr.file == next.file + 1 && curr.rank == next.rank + 2) || (curr.file == next.file + 1 && curr.rank == next.rank - 2))
-//                 ||
-//                 ((curr.file == next.file - 1 && curr.rank == next.rank + 2) || (curr.file == next.file - 1 && curr.rank == next.rank - 2))
-//                 )
-//             )
-//             {
-//                 return true;
-//             }
-            
-//             return false;
-//         }
-//         case 'b':
-//         case 'B':
-//         {
-//             if (invalidDiagonalMove(curr, next))
-//             {
-//                 return false;
-//             }
-
-//             return true;
-//         }
-//         case 'q':
-//         case 'Q':
-//         {
-//             if (invalidRookMove(curr, next))
-//             {
-//                 if (invalidDiagonalMove(curr, next))
-//                 {
-//                     return false;
-//                 }
-//             }
-//             return true;
-//         }
-//         case 'k':   // TODO: fix bug with black castle
-//         case 'K':
-//         {
-//             // check if the king will walk into a check
-
-//             // check if the square is 1 
-//             if (
-//                 (curr.rank - next.rank <= 1 && curr.rank - next.rank >= -1)
-//                 &&
-//                 (curr.file - next.file <= 1 && curr.file - next.file >= -1)
-//                 )
-//                 {
-//                     return true;
-//                 }
-
-//             // castle
-//             if (legalCastle(curr, next))
-//             {
-//                 return true;
-//             }
-
-//             return false;
-//         }
-//     }
-
-//     std::cerr << "this should never happen" << std::endl;
-    return false;
-}
-
-
-bool Position::isInBoardBounds(piecePos curr)
-{
-    if (curr.rank > 7 || curr.rank < 0)
-    {
-        return false;
-    }
-    else if (curr.file > 7 || curr.file < 0)
-    {
-        return false;
-    }
-    else
-    {
-        return true;
-    }
-}
-
-
-bool Position::legalEnpassant(piecePos curr, piecePos next)
+bool Position::legalEnpassant(PiecePos curr, PiecePos next)
 {
     // char piece = pieces.at(curr.rank).at(curr.file);
     // if (piece == 'p')
@@ -556,7 +162,7 @@ bool Position::legalEnpassant(piecePos curr, piecePos next)
 
 
 // check for obstacles (rook move) and a valid vertical/horizontal move
-bool Position::invalidRookMove(piecePos curr, piecePos next)
+bool Position::invalidRookMove(PiecePos curr, PiecePos next)
 {
     return false;
     // if (curr.rank == next.rank && curr.file == next.file) return true;
@@ -615,88 +221,15 @@ bool Position::invalidRookMove(piecePos curr, piecePos next)
 
 
 // check for obstacles (bishop move) and a valid diagonal
-bool Position::invalidDiagonalMove(piecePos curr, piecePos next)
+bool Position::invalidBishopMove(PiecePos curr, PiecePos next)
 {
-    // int y {64};
-    // int x {-64};
-    // if (curr.rank == next.rank && curr.file == next.file) return true;
-
-    // // if absolute values of (old.x - new.x) and (old.y - new.y) are equal then its a diagonal move
-    // if (curr.rank > next.rank)
-    // {
-    //     y = curr.rank - next.rank;
-    // }
-    // else
-    // {
-    //     y = next.rank - curr.rank;
-    // }
-
-    // if (curr.file > next.file)
-    // {
-    //     x = curr.file - next.file;
-    // }
-    // else
-    // {
-    //     x = next.file - curr.file;
-    // }
-
-    // if (x != y)
-    // {
-    //     return true;
-    // }
-    
-    // if (curr.rank > next.rank)
-    // {
-    //     if (curr.file > next.file)
-    //     {
-    //         for (int i {next.rank + 1}, j {next.file + 1}; i < curr.rank; i++, j++)
-    //         {
-    //             if (pieces.at(i).at(j) != '\0')
-    //             {
-    //                 return true;
-    //             }
-    //         }
-    //     }
-    //     else
-    //     {
-    //         for (int i {next.rank + 1}, j {next.file - 1}; i < curr.rank; i++, j--)
-    //         {
-    //             if (pieces.at(i).at(j) != '\0')
-    //             {
-    //                 return true;
-    //             }
-    //         }
-    //     }
-    // }
-    // else
-    // {
-    //     if (curr.file > next.file)
-    //     {
-    //         for (int i {next.rank - 1}, j {next.file + 1}; i > curr.rank; i--, j++)
-    //         {
-    //             if (pieces.at(i).at(j) != '\0')
-    //             {
-    //                 return true;
-    //             }
-    //         }
-    //     }
-    //     else
-    //     {
-    //         for (int i {next.rank - 1}, j {next.file - 1}; i > curr.rank; i--, j--)
-    //         {
-    //             if (pieces.at(i).at(j) != '\0')
-    //             {
-    //                 return true;
-    //             }
-    //         }
-    //     }
-    // }
+    // if absolute values of (old.x - new.x) and (old.y - new.y) are equal then its a diagonal move
 
     return false;
 }
 
 
-bool Position::legalCastle(piecePos curr, piecePos next)
+bool Position::legalCastle(PiecePos curr, PiecePos next)
 {
     // char king = pieces.at(curr.rank).at(curr.file);
 
@@ -793,12 +326,13 @@ bool Position::legalCastle(piecePos curr, piecePos next)
 // }
 
 
-bool Position::isMoveLegal(piecePos curr, piecePos next)
+bool Position::isMoveLegal(PiecePos curr, PiecePos next)
 {
-    // if (curr.rank == next.rank && curr.file == next.file)
-    // {
-    //     return false;
-    // }
+    // move to same place
+    if (curr.rank == next.rank && curr.file == next.file)
+    {
+        return false;
+    }
 
     // // check if any given rank/file is within the chessboard bounds
     // if (!isInBoardBounds(curr))
@@ -838,7 +372,7 @@ bool Position::isMoveLegal(piecePos curr, piecePos next)
 }
 
 
-bool Position::movePiece(piecePos curr, piecePos next)
+bool Position::movePiece(PiecePos curr, PiecePos next)
 {
     std::cout << curr.file << curr.rank << '\n';
     std::cout << next.file << next.rank << std::endl;
@@ -854,8 +388,8 @@ bool Position::movePiece(piecePos curr, piecePos next)
     // }
 
     // check if selected square has piece on it
-    bitboard currPiece {1};
-    currPiece <<= (curr.file) + (curr.rank) * 8;
+    bitboard currPiece = curr.returnBitboard();
+
     size_t indexCurr {0};
     for (; indexCurr < pieces.size(); indexCurr++)
     {
@@ -901,3 +435,30 @@ bool Position::movePiece(piecePos curr, piecePos next)
 // {
 //     ;
 // }
+
+
+size_t binaryHammingWeight(bitboard in) // by Peter Wegner (1960)
+{
+    size_t count = 0;
+    while (in) {
+        count++;
+        in &= in - 1; // reset LS1B
+    }
+    return count;
+}
+
+PiecePos bitboardToPiecePos(bitboard piece)
+{
+    if (binaryHammingWeight(piece) != 1)
+    {
+        return {-1, -1};
+    }
+
+    int j {1};
+    for (bitboard i {1}; !(piece & i); i <<= 1)
+    {
+        j++;
+    }
+
+    return {(j / 8), (j % 8)};
+}
