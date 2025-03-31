@@ -1,27 +1,15 @@
-#include <SFML/Graphics.hpp>
 #include <vector>
 #include <array>
 #include <string>
+
+#include <SFML/Graphics.hpp>
 #include "gameLogic.h"
+
 #ifndef _INTERFACE_H_
 #define _INTERFACE_H_
 
-enum PiecesInArray
-{
-    wPawn = 0,
-    wRook,
-    wKnight,
-    wBishop,
-    wQueen,
-    wKing,
-    bPawn,
-    bRook,
-    bKnight,
-    bBishop,
-    bQueen,
-    bKing
-};
 
+class Interface;
 
 class GameGraphics
 {
@@ -37,19 +25,10 @@ public:
     std::array<sf::Sprite, 12> piecesSprites;
 
     sf::CircleShape legalMove;
-    bool legalMoves[8][8] {false};  //[rank][file]
     float circleOffset {0};
     
     sf::RectangleShape picked;
     sf::RectangleShape checkmate;
-
-    sf::Vector2i mouse;
-    sf::Vector2f mouseF;
-    
-    bool firstClick {false};
-    bool secondClick {false};
-    piecePos firstPos {0, 0};
-    piecePos secondPos {0, 0};
 
     // size of chessboard and piece rectangles
     // set by setScale()
@@ -59,14 +38,10 @@ public:
     const unsigned int WHEIGHT {800};
     const unsigned int WWIDTH {800};
     const sf::FloatRect board {0.f, 0.f, 800.f, 800.f};
-
-    void leftMouseInteract(sf::RenderWindow* const window, Position* const curr);
-    void resetPicked();
+    
     void drawPosition(sf::RenderWindow* const window, Position* const pos);
-    void getLegalMoves(Position* const pos);
-    void resetLegalMoves();
-    void drawLegalMoves(sf::RenderWindow* const window, Position* const pos);
-    sf::Sprite returnSprite(char piece);
+    void drawLegalMoves(sf::RenderWindow* const window, Interface* const ui);
+    sf::Sprite returnSprite(size_t piece);
     sf::Sprite* shareSprite(size_t temp);
     bool loadGameTextures();
     void setTextures();
@@ -74,6 +49,23 @@ public:
     GameGraphics();
 };
 
-
+class Interface
+{
+private:
+    sf::Vector2f mouseF;
+    
+    bool firstClick {false};
+    bool secondClick {false};
+    PiecePos firstPos {0, 0};
+    PiecePos secondPos {0, 0};
+public:
+    bitboard legalMoves {0};
+    sf::Vector2i mouse;
+    
+    void leftMouseInteract(sf::RenderWindow* const window, Position* const curr, GameGraphics* const g);
+    void getLegalMoves(Position* const pos);
+    void resetLegalMoves();
+    void resetPicked(GameGraphics* const g);
+};
 
 #endif
