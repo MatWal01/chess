@@ -33,6 +33,7 @@ public:
 
     bitboard returnBitboard();
     bool isInBoardBounds();
+    friend bool operator== (const PiecePos i, const PiecePos j);
 };
 
 class Position
@@ -41,7 +42,7 @@ public:
     size_t moves {0};
     size_t halfmoves {0};
 
-    char onMove {'W'};
+    bool whiteOnMove {true};
     std::string enpassant {"-"};
     std::string moveNotation;
     std::string FEN;
@@ -50,10 +51,10 @@ public:
     std::unique_ptr<Position> next;
 
     // castle rights kingside and queenside
-    bool wKingside {false}; 
-    bool wQueenside {false};
-    bool bKingside {false};
-    bool bQueenside {false};
+    bool wKingside {true}; 
+    bool wQueenside {true};
+    bool bKingside {true};
+    bool bQueenside {true};
 
     bool end {false};
     
@@ -77,14 +78,14 @@ public:
 private:
     bool isInCheck();
     bool areLegalMovesLeft();
-    bool legalEnpassant(PiecePos curr, PiecePos next);
+    bool invalidPawnMove(PiecePos curr, PiecePos next);
     bool invalidRookMove(PiecePos curr, PiecePos next);
     bool invalidKnightMove(PiecePos curr, PiecePos next);
     bool invalidBishopMove(PiecePos curr, PiecePos next);
+    bool invalidKingMove(PiecePos curr, PiecePos next);
     bool legalCastle(PiecePos curr, PiecePos next);
 public:
     bool isMoveLegal(PiecePos curr, PiecePos next);
-    bool isProperPieceMove(PiecePos curr, PiecePos next);
     bool movePiece(PiecePos curr, PiecePos next);
     
     // std::string moveToAlgebraicNotation(piecePos curr, piecePos next);

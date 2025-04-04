@@ -33,7 +33,6 @@ void GameGraphics::drawLegalMoves(sf::RenderWindow* const window, Interface* con
 {
     if (!(ui->legalMoves))
     {
-        window->draw(checkmate);
         return;
     }
 
@@ -211,16 +210,25 @@ void Interface::leftMouseInteract(sf::RenderWindow* const window, Position* cons
 
 void Interface::getLegalMoves(Position* const pos)
 {
+    legalMoves = 0;
     if (!firstClick)
     {
-        legalMoves = 0;
+        return;
     }
     else if (secondClick)
     {
-        legalMoves = 0;
+        return;
     }
 
+    bitboard temp {1};
     // legalMoves = ;
+    for (int i {0}; i < 64; i++, temp <<= 1)
+    {
+        if (pos->isMoveLegal(firstPos, {(i / 8), (i % 8)}))
+        {
+            legalMoves |= temp;
+        }
+    }
 }
 
 
