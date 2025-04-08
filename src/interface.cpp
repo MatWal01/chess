@@ -210,25 +210,7 @@ void Interface::leftMouseInteract(sf::RenderWindow* const window, Position* cons
 
 void Interface::getLegalMoves(Position* const pos)
 {
-    legalMoves = 0;
-    if (!firstClick)
-    {
-        return;
-    }
-    else if (secondClick)
-    {
-        return;
-    }
-
-    bitboard temp {1};
-    // legalMoves = ;
-    for (int i {0}; i < 64; i++, temp <<= 1)
-    {
-        if (pos->isMoveLegal(firstPos, {(i / 8), (i % 8)}))
-        {
-            legalMoves |= temp;
-        }
-    }
+    legalMoves = pos->legalMoves(firstPos);
 }
 
 

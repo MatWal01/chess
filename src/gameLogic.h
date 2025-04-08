@@ -7,6 +7,8 @@
 #include <cstdint>
 #include <SFML/Graphics.hpp>
 
+// boolean representation of a chessboard (1 - piece is present, 0 - is not)
+// 2^0 is A1 square 2^63 is H8 square
 typedef std::uint64_t bitboard;
 
 enum class Pieces
@@ -78,14 +80,18 @@ public:
 private:
     bool isInCheck();
     bool areLegalMovesLeft();
-    bool invalidPawnMove(PiecePos curr, PiecePos next);
-    bool invalidRookMove(PiecePos curr, PiecePos next);
-    bool invalidKnightMove(PiecePos curr, PiecePos next);
-    bool invalidBishopMove(PiecePos curr, PiecePos next);
-    bool invalidKingMove(PiecePos curr, PiecePos next);
-    bool legalCastle(PiecePos curr, PiecePos next);
+    bitboard allWhitePieces();
+    bitboard allBlackPieces();
+    bitboard minusYourPieces(bitboard moves);
+    bitboard legalPawnMoves(PiecePos curr);
+    bitboard legalRookMoves(PiecePos curr);
+    bitboard legalKnightMoves(PiecePos curr);
+    bitboard legalBishopMoves(PiecePos curr);
+    bitboard legalQueenMoves(PiecePos curr);
+    bitboard legalKingMoves(PiecePos curr);
+    bitboard legalCastle();
 public:
-    bool isMoveLegal(PiecePos curr, PiecePos next);
+    bitboard legalMoves(PiecePos curr);
     bool movePiece(PiecePos curr, PiecePos next);
     
     // std::string moveToAlgebraicNotation(piecePos curr, piecePos next);
