@@ -1,12 +1,10 @@
+#pragma once
 #include <vector>
 #include <array>
 #include <string>
 
 #include <SFML/Graphics.hpp>
 #include "gameLogic.h"
-
-#ifndef _INTERFACE_H_
-#define _INTERFACE_H_
 
 
 class Interface;
@@ -67,5 +65,3 @@ public:
     void resetLegalMoves();
     void resetPicked(GameGraphics* const g);
 };
-
-#endif

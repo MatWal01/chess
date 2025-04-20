@@ -1,5 +1,6 @@
 #include <iostream>
-#include <bitset>
+#include <tuple>
+#include <array>
 
 #include "gameLogic.h"
 #include "interface.h"
@@ -25,7 +26,7 @@ bool PiecePos::isInBoardBounds()
 bitboard PiecePos::returnBitboard()
 {
     bitboard temp {1};
-    temp <<= (file) + (rank) * 8;
+    temp <<= file + rank * 8;
     return temp;
 }
 
@@ -35,54 +36,266 @@ bool operator== (const PiecePos i, const PiecePos j)
     return (i.rank == j.rank && i.file == j.file);
 }
 
-// TODO
-bool Position::isInCheck()
+// Done?
+bool Position::isInCheck(PiecePos curr)
 {
-    // no king on the board
-    if (
-        !(pieces.at(static_cast<int>(Pieces::wKing)))
-        ||
-        !(pieces.at(static_cast<int>(Pieces::bKing)))
-        )
+    // if the king can take the piece using the moves of that piece then that piece can take the king
+    // eg. if king can take knight witk L shaped move then the knight checks the king
+    
+    // offsets index of pieces by a color (white +6 to so index shows black pieces)
+    size_t colorIndex {0};
+    if (whiteOnMove)
     {
-        return false;
+        colorIndex = 6;
     }
 
-    // TODO:
-    // create a new position as if you had not made a move
-    // if your king can be taken you are in check 
+    // for all pieces
+    for (size_t pieceIndex {0}; pieceIndex < 6; pieceIndex++)
+    {
+        bool inCheck {false};
+
+        switch (pieceIndex)
+        {
+            case 0:
+                inCheck = static_cast<bool>(pieces.at(pieceIndex + colorIndex) & legalPawnTakes(curr));
+                break;
+            case 1:
+                inCheck = static_cast<bool>(pieces.at(pieceIndex + colorIndex) & legalRookMoves(curr));
+                break;
+            case 2:
+                inCheck = static_cast<bool>(pieces.at(pieceIndex + colorIndex) & legalKnightMoves(curr));
+                break;
+            case 3:
+                inCheck = static_cast<bool>(pieces.at(pieceIndex + colorIndex) & legalBishopMoves(curr));
+                break;
+            case 4:
+                inCheck = static_cast<bool>(pieces.at(pieceIndex + colorIndex) & legalQueenMoves(curr));
+                break;
+            case 5:
+                inCheck = static_cast<bool>(pieces.at(pieceIndex + colorIndex) & legalKingMoves(curr));
+                break;
+        }
+
+        if (inCheck)
+        {
+            std::cout << "True" << ' ' << pieceIndex << '\n';
+            return true;
+        }
+    }
 
     return false;
 }
 
 
-// bool Position::areLegalMovesLeft()
-// {
-//     for (int i {0}; i < 8; i++)
-//     {
-//         for (int j {0}; j < 8; j++)
-//         {
-//             if (islower(pieces.at(i).at(j)) == islower(onMove))
-//             {
-//                 for (int rank {0}; rank < 8; rank++)
-//                 {
-//                     for (int file {0}; file < 8; file++)
-//                     {
-//                         if (isProperPieceMove({i, j}, {rank, file}))
-//                         {
-//                             if (isMoveLegal({i, j}, {rank, file}))
-//                             {
-//                                 return true;
-//                             }
-//                         }
-//                     }
-//                 }
-//             }
-//         }
-//     }
+bool Position::isInCheck()
+{
+    if (whiteOnMove)
+    {
+        return isInCheck(bitboardToPiecePos(pieces.at(static_cast<size_t>(Pieces::wKing))));       
+    }
+    else
+    {
+        return isInCheck(bitboardToPiecePos(pieces.at(static_cast<size_t>(Pieces::bKing))));       
+    }
+}
 
-//     return false;
-// }
+
+bool Position::areLegalMovesLeft()
+{
+    // for (int i {0}; i < 64; i++)
+    // {
+    //     if (static_cast<bool>(legalMoves({i % 8, i / 8})))
+    //     {
+    //         return true;
+    //     }
+    // }
+    // return false;
+    return true;
+}
+
+// threats made by side on move
+bitboard Position::activity()
+{
+    bitboard threats {0};
+    size_t pieceIndex {6};
+    if (whiteOnMove)
+    {
+        pieceIndex = 0;
+    }
+
+    bitboard c {1};
+    // pawn takes
+    for (int i {0}; i < 64; i++, c <<= 1)
+    {
+        PiecePos temp {-1, -1};
+        if (pieces.at(pieceIndex) & c)
+        {
+            threats |= legalPawnTakes({i / 8, i % 8});
+        }
+    }
+    pieceIndex++;
+    c = 1;
+
+    // rook moves
+    for (int i {0}; i < 64; i++, c <<= 1)
+    {
+        PiecePos temp {-1, -1};
+        if (pieces.at(pieceIndex) & c)
+        {
+            threats |= legalRookMoves({i / 8, i % 8});
+        }
+    }
+    pieceIndex++;
+    c = 1;
+
+    // knight moves
+    for (int i {0}; i < 64; i++, c <<= 1)
+    {
+        PiecePos temp {-1, -1};
+        if (pieces.at(pieceIndex) & c)
+        {
+            threats |= legalKnightMoves({i / 8, i % 8});
+        }
+    }
+    pieceIndex++;
+    c = 1;
+
+    // bishop moves
+    for (int i {0}; i < 64; i++, c <<= 1)
+    {
+        PiecePos temp {-1, -1};
+        if (pieces.at(pieceIndex) & c)
+        {
+            threats |= legalBishopMoves({i / 8, i % 8});
+        }
+    }
+    pieceIndex++;
+    c = 1;
+
+    // queen moves
+    for (int i {0}; i < 64; i++, c <<= 1)
+    {
+        PiecePos temp {-1, -1};
+        if (pieces.at(pieceIndex) & c)
+        {
+            threats |= legalQueenMoves({i / 8, i % 8});
+        }
+    }
+    pieceIndex++;
+    c = 1;
+
+    // king moves
+    for (int i {0}; i < 64; i++, c <<= 1)
+    {
+        PiecePos temp {-1, -1};
+        if (pieces.at(pieceIndex) & c)
+        {
+            threats |= legalKingMoves({i / 8, i % 8});
+        }
+    }
+    pieceIndex++;
+    c = 1;
+
+    return threats;
+}
+
+// threats made
+bitboard Position::threats()
+{
+    bitboard threats {0};
+    
+    // make a position as if no move has been made
+    Position tempBoard = *this;
+    if (tempBoard.whiteOnMove)
+    {
+        whiteOnMove = false;
+    }
+    else
+    {
+        whiteOnMove = true;
+    }
+
+    size_t pieceIndex {6};
+    if (tempBoard.whiteOnMove)
+    {
+        pieceIndex = 0;
+    }
+
+    bitboard c {1};
+    // pawn takes
+    for (int i {0}; i < 64; i++, c <<= 1)
+    {
+        PiecePos temp {-1, -1};
+        if (pieces.at(pieceIndex) & c)
+        {
+            threats |= tempBoard.legalPawnTakes({i / 8, i % 8});
+        }
+    }
+    pieceIndex++;
+    c = 1;
+
+    // rook moves
+    for (int i {0}; i < 64; i++, c <<= 1)
+    {
+        PiecePos temp {-1, -1};
+        if (pieces.at(pieceIndex) & c)
+        {
+            threats |= tempBoard.legalRookMoves({i / 8, i % 8});
+        }
+    }
+    pieceIndex++;
+    c = 1;
+
+    // knight moves
+    for (int i {0}; i < 64; i++, c <<= 1)
+    {
+        PiecePos temp {-1, -1};
+        if (pieces.at(pieceIndex) & c)
+        {
+            threats |= tempBoard.legalKnightMoves({i / 8, i % 8});
+        }
+    }
+    pieceIndex++;
+    c = 1;
+
+    // bishop moves
+    for (int i {0}; i < 64; i++, c <<= 1)
+    {
+        PiecePos temp {-1, -1};
+        if (pieces.at(pieceIndex) & c)
+        {
+            threats |= tempBoard.legalBishopMoves({i / 8, i % 8});
+        }
+    }
+    pieceIndex++;
+    c = 1;
+
+    // queen moves
+    for (int i {0}; i < 64; i++, c <<= 1)
+    {
+        PiecePos temp {-1, -1};
+        if (pieces.at(pieceIndex) & c)
+        {
+            threats |= tempBoard.legalQueenMoves({i / 8, i % 8});
+        }
+    }
+    pieceIndex++;
+    c = 1;
+
+    // king moves
+    for (int i {0}; i < 64; i++, c <<= 1)
+    {
+        PiecePos temp {-1, -1};
+        if (pieces.at(pieceIndex) & c)
+        {
+            threats |= tempBoard.legalKingMoves({i / 8, i % 8});
+        }
+    }
+    pieceIndex++;
+    c = 1;
+
+    return threats;
+}
 
 // sum of white bitboards
 bitboard Position::allWhitePieces()
@@ -120,7 +333,7 @@ bitboard Position::minusYourPieces(bitboard moves)
     {
         moves -= moves & allBlackPieces();
     }
-    
+
     return moves;
 }
 
@@ -128,40 +341,43 @@ bitboard Position::minusYourPieces(bitboard moves)
 bitboard Position::legalPawnMoves(PiecePos curr)
 {
     bitboard legalMoves {0};
-    bitboard legalTakes {0};
     bitboard oppositePieces {0};
     bitboard c {curr.returnBitboard()};
     bitboard firstMove {0};
     
+    // by multiplying im shifting bit by 7 (128), 8 (256), 9 (512)...
     if (whiteOnMove)
     {
         legalMoves = c * 256;
-        legalTakes = c * 512 + c * 128;
 
-        firstMove = 0x000000000000FF00;
+        firstMove = SECONDRANK;
 
         oppositePieces = allBlackPieces();
 
         if (static_cast<bool>(firstMove & c))
         {
-            legalMoves += c * 65536;
+            if (!(static_cast<bool>(oppositePieces & c * 256)))
+            {
+                legalMoves += c * 65536;
+            }
         }
     }
     else
     {
         legalMoves = c / 256;
-        legalTakes = c / 512 + c / 128;
-        
-        firstMove = 0x00FF000000000000;
+
+        firstMove = SEVENTHRANK;
 
         oppositePieces = allWhitePieces();
         
         if (static_cast<bool>(firstMove & c))
         {
-            legalMoves += c / 65536;
+            if (!(static_cast<bool>(oppositePieces & c / 256)))
+            {
+                legalMoves += c / 65536;
+            }
         }
     }
-
 
     // pieces you cannot take
     legalMoves = minusYourPieces(legalMoves);
@@ -169,32 +385,151 @@ bitboard Position::legalPawnMoves(PiecePos curr)
     legalMoves -= legalMoves & oppositePieces;
 
     // pieces you can take
-    oppositePieces |= enpassantSquare;
-    legalMoves += (legalTakes & oppositePieces);
+    legalMoves += legalPawnTakes(curr);
 
     return legalMoves;
 }
 
 
+bitboard Position::legalPawnTakes(PiecePos curr)
+{
+    bitboard c {curr.returnBitboard()};
+    bitboard legalTakes {0};
+    bool onAFile {static_cast<bool>(AFILE & c)};
+    bool onHFile {static_cast<bool>(HFILE & c)};
+    bitboard oppositePieces {0};
+
+    // by multiplying im shifting bit by 7 (128), 8 (256), 9 (512)...
+    if (whiteOnMove)
+    {
+        
+        if (!onAFile)
+        {
+            legalTakes += c * 128;
+        }
+
+        if (!onHFile)
+        {
+            legalTakes += c * 512;
+        }
+
+        oppositePieces = allBlackPieces();
+    }
+    else
+    {
+        if (!onAFile)
+        {
+            legalTakes += c / 512;
+        }
+
+        if (!onHFile)
+        {
+            legalTakes += c / 128;
+        }
+
+        oppositePieces = allWhitePieces();
+    }
+    
+    oppositePieces |= enpassantSquare;
+    return legalTakes & oppositePieces;
+}
+
+
 bitboard Position::legalRookMoves(PiecePos curr)
 {
-    bitboard tempRank {0x101010101010101};
-    bitboard tempFile {0xFF};
     bitboard c = curr.returnBitboard();
+    bitboard tempRank {AFILE};
+    bitboard tempFile {FIRSTRANK};
     for (; !(tempRank & c); tempRank *= 2)
     {
         ;
     }
 
-    bitboard legalMoves {tempRank};
     
     for (; !(tempFile & c); tempFile <<= 8)
     {
         ;
     }
 
-    legalMoves |= tempFile;
-    legalMoves = minusYourPieces(legalMoves);
+    // check for colisions
+    bitboard opponentPieces;
+    bitboard currentPieces;
+    if (whiteOnMove)
+    {
+        currentPieces = allWhitePieces() - c;
+        opponentPieces = allBlackPieces();
+    }
+    else
+    {
+        currentPieces = allBlackPieces() - c;
+        opponentPieces = allWhitePieces();
+    }
+
+    bitboard verticalMoves {0};
+    // north
+    for (bitboard i {c << 8}; i != 0; i <<= 8)
+    {
+        if (i & currentPieces)
+        {
+            break;
+        }
+
+        verticalMoves += i;
+        if (i & opponentPieces)
+        {
+            break;
+        }
+    }
+
+    // south
+    for (bitboard i {c >> 8}; i != 0; i >>= 8)
+    {
+        if (i & currentPieces)
+        {
+            break;
+        }
+
+        verticalMoves += i;
+        if (i & opponentPieces)
+        {
+            break;
+        }
+    }
+
+    // east
+    // ends if i is on A file
+    bitboard notAFile {~AFILE};
+    for (bitboard i {c << 1}; i & notAFile; i <<= 1)
+    {
+        if (i & currentPieces)
+        {
+            break;
+        }
+
+        verticalMoves += i;
+        if (i & opponentPieces)
+        {
+            break;
+        }
+    }
+
+    // // west
+    bitboard notHFile {~HFILE};
+    for (bitboard i {c >> 1}; i & notHFile; i >>= 1)
+    {
+        if (i & currentPieces)
+        {
+            break;
+        }
+
+        verticalMoves += i;
+        if (i & opponentPieces)
+        {
+            break;
+        }
+    }
+
+    bitboard legalMoves {verticalMoves};
     return legalMoves;
 }
 
@@ -205,10 +540,10 @@ bitboard Position::legalKnightMoves(PiecePos curr)
     bitboard legalMoves {0};
 
     // prevent wraping moves around side edges of the board (eg.: H1 <<= 1 is A2)
-    bool onAFile {static_cast<bool>(0x0101010101010101 & c)};
-    bool onBFile {static_cast<bool>(0x0202020202020202 & c)};
-    bool onGFile {static_cast<bool>(0x4040404040404040 & c)};
-    bool onHFile {static_cast<bool>(0x8080808080808080 & c)};
+    bool onAFile {static_cast<bool>(AFILE & c)};
+    bool onBFile {static_cast<bool>(BFILE & c)};
+    bool onGFile {static_cast<bool>(GFILE & c)};
+    bool onHFile {static_cast<bool>(HFILE & c)};
 
     // 8 legal moves
     if (!onGFile && !onHFile)
@@ -242,40 +577,85 @@ bitboard Position::legalKnightMoves(PiecePos curr)
 
 bitboard Position::legalBishopMoves(PiecePos curr)
 {
-    // File - rank
-    int fR {curr.file - curr.rank};
-    // 7 - File - Rank
-    int sFR {7 - curr.file - curr.rank};
-    // diagonals
-    // from A1 to H8
-    bitboard diagA1H8 {0x8040201008040201};
-    // from H1 to A8
-    bitboard diagH1A8 {0x0102040810204080};
-
-    // move up or down diagonals depending on position curr (point of intersection)
-    if (fR > 0)
+    bitboard c = curr.returnBitboard();
+    bitboard opponentPieces;
+    bitboard currentPieces;
+    if (whiteOnMove)
     {
-        diagA1H8 >>= fR * 8;
+        currentPieces = allWhitePieces() - c;
+        opponentPieces = allBlackPieces();
     }
-    else if (fR < 0)
+    else
     {
-        fR *= -1;
-        diagA1H8 <<= fR * 8;
-    }
-    
-    if (sFR > 0)
-    {
-        diagH1A8 >>= sFR * 8;
-    }
-    else if (sFR < 0)
-    {
-        sFR *= -1;
-        diagH1A8 <<= sFR * 8;
+        currentPieces = allBlackPieces() - c;
+        opponentPieces = allWhitePieces();
     }
 
-    bitboard legalMoves {diagA1H8 | diagH1A8};
+    bitboard legalMoves {0};
+    // north east
+    bitboard cCopy = c << 9;
+    for (PiecePos i {curr}; i.rank != 7 && i.file != 7; i.rank++, i.file++, cCopy <<= 9)
+    {
+        if (cCopy & currentPieces)
+        {
+            break;
+        }
 
-    legalMoves = minusYourPieces(legalMoves);
+        legalMoves += cCopy;
+        if (cCopy & opponentPieces)
+        {
+            break;
+        }
+    }
+
+    // north west
+    cCopy = c << 7;
+    for (PiecePos i {curr}; i.rank != 7 && i.file != 0; i.rank++, i.file--, cCopy <<= 7)
+    {
+        if (cCopy & currentPieces)
+        {
+            break;
+        }
+
+        legalMoves += cCopy;
+        if (cCopy & opponentPieces)
+        {
+            break;
+        }
+    }
+
+    // south west
+    cCopy = c >> 9;
+    for (PiecePos i {curr}; i.rank != 0 && i.file != 0; i.rank--, i.file--, cCopy >>= 9)
+    {
+        if (cCopy & currentPieces)
+        {
+            break;
+        }
+
+        legalMoves += cCopy;
+        if (cCopy & opponentPieces)
+        {
+            break;
+        }
+    }
+
+    // south east
+    cCopy = c >> 7;
+    for (PiecePos i {curr}; i.rank != 0 && i.file != 7; i.rank--, i.file++, cCopy >>= 7)
+    {
+        if (cCopy & currentPieces)
+        {
+            break;
+        }
+
+        legalMoves += cCopy;
+        if (cCopy & opponentPieces)
+        {
+            break;
+        }
+    }
+
     return legalMoves;
 }
 
@@ -290,8 +670,8 @@ bitboard Position::legalQueenMoves(PiecePos curr)
 bitboard Position::legalKingMoves(PiecePos curr)
 {
     bitboard c = curr.returnBitboard();
-    bool onAFile {static_cast<bool>(0x0101010101010101 & c)};
-    bool onHFile {static_cast<bool>(0x8080808080808080 & c)};
+    bool onAFile {static_cast<bool>(AFILE & c)};
+    bool onHFile {static_cast<bool>(HFILE & c)};
     bitboard legalMoves {0};
     
     if (onAFile)
@@ -338,73 +718,140 @@ bitboard Position::legalKingMoves(PiecePos curr)
     }
     legalMoves -= (legalMoves & sameColor);
 
-    // TODO: add castling in the future
-
     legalMoves = minusYourPieces(legalMoves);
     return legalMoves;
 }
 
 
-bitboard Position::legalCastle()
+bitboard Position::legalCastle(PiecePos curr)
 {
+    bitboard c {curr.returnBitboard()};
+    // check the castling rights and if the king is selected
     if (whiteOnMove)
     {
         if (!(wQueenside || wKingside))
         {
-            return false;
+            return 0;
+        }
+
+        if (!(static_cast<bool>(c & pieces.at(static_cast<size_t>(Pieces::wKing)))))
+        {
+            return 0;
         }
     }
     else
     {
         if (!(bQueenside || bKingside))
         {
-            return false;
+            return 0;
+        }
+
+        if (!(static_cast<bool>(c & pieces.at(static_cast<size_t>(Pieces::bKing)))))
+        {
+            return 0;
         }
     }
     
-    if (isInCheck())
+    if (isInCheck(curr))
     {
-        return false;
+        return 0;
     }
     
-    // if (invalidRookMove(curr, next))
-    // {
-    //     return false;
-    // }
-    // if (king == 'K')
-    // {
-    //     if (curr.rank == 0 && next.rank == 0)
-    //     {
-    //         if (curr.file == next.file + 2 && wQueenside)
-    //         {
-    //             return true;
-    //         }
-    //         else if (curr.file == next.file - 2 && wKingside)
-    //         {
-    //             return true;
-    //         }
-    //     }
-    // }
-    // else if (king == 'k')
-    // {
-    //     if (curr.rank == 7 && next.rank == 7)
-    //     {
-    //         if (curr.file == next.file + 2 && bQueenside)
-    //         {
-    //             return true;
-    //         }
-    //         else if (curr.file == next.file - 2 && bKingside)
-    //         {
-    //             return true;
-    //         }
-    //     }
-    // }
+    bitboard blockingPieces {allWhitePieces() + allBlackPieces()};
+    bitboard legalMoves {0};
+    if (whiteOnMove)
+    {
+        if (wKingside)
+        {
+            if (!static_cast<bool>(blockingPieces & WCASTLEKINGSIDE))
+            {
+                legalMoves += 0x80;
+            }
+        }
+        
+        if (wQueenside)
+        {
+            if (!static_cast<bool>(blockingPieces & WCASTLEQUEENSIDE))
+            {
+                legalMoves += 0x01;
+            }
+        }
+    }
+    else
+    {
+        if (bQueenside)
+        {
+            if (!static_cast<bool>(blockingPieces & BCASTLEQUEENSIDE))
+            {
+                legalMoves += BQUEENSIDEROOK;
+            }
+        }
 
-    return false;
+        if (bKingside)
+        {
+            if (!static_cast<bool>(blockingPieces & BCASTLEKINGSIDE))
+            {
+                legalMoves += BKINGSIDEROOK;
+            }
+        }
+    }
+
+    return legalMoves;
 }
 
 
-bitboard Position::legalMoves(PiecePos curr)
+std::tuple<bitboard, bitboard> Position::makeMove(bitboard movedPiece, bitboard takenPiece, size_t movedIndex, size_t takenIndex)
+{
+    bitboard pastMoved {pieces.at(movedIndex)};
+    bitboard pastTaken {0};
+
+    // if there was piece to take
+    if (takenIndex != 12)
+    {
+        pastTaken = pieces.at(takenIndex);
+        // then take it
+        pieces.at(takenIndex) -= takenPiece;
+    }
+
+    // move picked piece to a new position
+    pieces.at(movedIndex) -= movedPiece;
+    pieces.at(movedIndex) += takenPiece;
+        
+    // take while enpassant
+    // only if pawn takes
+    if (movedIndex % 6 == 0)
+    {
+        if (enpassantSquare & takenPiece)
+        {
+            if (whiteOnMove)
+            {
+                pastTaken = pieces.at(static_cast<size_t>(Pieces::bPawn));
+                bitboard enpassant {takenPiece >> 8};
+                pieces.at(static_cast<size_t>(Pieces::bPawn)) -= enpassant;
+            }
+            else
+            {
+                pastTaken = pieces.at(static_cast<size_t>(Pieces::wPawn));
+                bitboard enpassant {takenPiece << 8};
+                pieces.at(static_cast<size_t>(Pieces::wPawn)) -= enpassant;
+            }
+        } 
+    }
+
+    return {pastMoved, pastTaken};
+}
+
+
+void Position::unmakeMove(std::tuple<bitboard, bitboard> past, size_t movedIndex, size_t takenIndex)
+{
+    pieces.at(movedIndex) = std::get<0>(past);
+    if (takenIndex != 12)
+    {
+        pieces.at(takenIndex) = std::get<1>(past);
+    }
+}
+
+bitboard Position::pseudoLegalMoves(PiecePos curr)
 {
     // check if any given rank/file is within the chessboard bounds
     if (!curr.isInBoardBounds())
@@ -458,7 +905,7 @@ bitboard Position::legalMoves(PiecePos curr)
         case 4:
             return legalQueenMoves(curr);
         case 5:
-            return legalKingMoves(curr);
+            return legalKingMoves(curr) + legalCastle(curr);
         default:
         {
             std::cerr << "isMoveLegal(): should never happen - switch default\n";
@@ -470,12 +917,19 @@ bitboard Position::legalMoves(PiecePos curr)
     return 0;
 }
 
+
+bitboard Position::legalMoves(PiecePos curr)
+{
+    return pseudoLegalMoves(curr);
+}
+
+
 // calls isMoveLegal(), moves a piece, changes the castle rights and ensures the same side cannot move twice
 bool Position::movePiece(PiecePos curr, PiecePos next)
 {
     bitboard currPiece = curr.returnBitboard();
     bitboard nextPiece = next.returnBitboard();
-    bitboard legalMoves = this->legalMoves(curr);
+    bitboard legalMoves = this->pseudoLegalMoves(curr);
     
     if (!legalMoves)
     {
@@ -487,34 +941,54 @@ bool Position::movePiece(PiecePos curr, PiecePos next)
         return false;
     }
 
-    size_t indexCurr {0};
     // find a kind of a piece on a destination square
-    for (; indexCurr < pieces.size(); indexCurr++)
+    size_t indexCurr {findPiece(currPiece, &pieces)};
+
+    // find a kind of a piece on a destination square
+    size_t indexNext {findPiece(nextPiece, &pieces)};
+
+    // move piece (including enpassant)
+    std::tuple<bitboard, bitboard> past = makeMove(currPiece, nextPiece, indexCurr, indexNext);
+
+    // castle
+    // rook is already taken so I dont have to subtract it
+    if (whiteOnMove)
     {
-        if (currPiece & pieces.at(indexCurr))
+        if (currPiece & WKING && nextPiece & WQUEENSIDEROOK)
         {
-            break;
+            pieces.at(static_cast<size_t>(Pieces::wKing)) = WQUEENSIDEKINGMOVE;
+            pieces.at(static_cast<size_t>(Pieces::wRook)) += WQUEENSIDEROOKMOVE;
+        }
+        else if (currPiece & WKING && nextPiece & WKINGSIDEROOK)
+        {
+            pieces.at(static_cast<size_t>(Pieces::wKing)) = WKINGSIDEKINGMOVE;
+            pieces.at(static_cast<size_t>(Pieces::wRook)) += WKINGSIDEROOKMOVE;
+        }
+    }
+    else
+    {
+        if (currPiece & BKING && nextPiece & BQUEENSIDEROOK)
+        {
+            pieces.at(static_cast<size_t>(Pieces::bKing)) = BQUEENSIDEKINGMOVE;
+            pieces.at(static_cast<size_t>(Pieces::bRook)) += BQUEENSIDEROOKMOVE;
+        }
+        else if (currPiece & BKING && nextPiece & BKINGSIDEROOK)
+        {
+            pieces.at(static_cast<size_t>(Pieces::bKing)) = BKINGSIDEKINGMOVE;
+            pieces.at(static_cast<size_t>(Pieces::bRook)) += BKINGSIDEROOKMOVE;
         }
     }
 
-    size_t indexNext {0};
-    // find a kind of a piece on a destination square
-    for (; indexNext < pieces.size(); indexNext++)
-    {
-        if (nextPiece & pieces.at(indexNext))
-        {
-            // and take the piece
-            pieces.at(indexNext) -= nextPiece;
-            break;
-        }
-    }
+    // // TODO: if inCheck() then unmakeMove and return false
+    // if (isInCheck())
+    // {
+    //     unmakeMove(past, indexCurr, indexNext);
+    //     return false;
+    // }
 
-    // remove picked piece from origin
-    pieces.at(indexCurr) -= currPiece;
+    // TODO: promote pawns
 
-    // add selected piece
-    pieces.at(indexCurr) += nextPiece;
-    
+    // handle rights and rules after making a move
     // if firstMove then add enpassantSquare
     bool enpassantChanged {false};
     if (indexCurr == static_cast<size_t>(Pieces::wPawn))
@@ -535,29 +1009,7 @@ bool Position::movePiece(PiecePos curr, PiecePos next)
             enpassantChanged = true;
         }
     }
-    
-    // take while enpassant
-    if (static_cast<bool>(enpassantSquare & nextPiece))
-    {
-        if (whiteOnMove)
-        {
-            PiecePos enpassantPos {next.rank - 1, next.file};
-            pieces.at(static_cast<size_t>(Pieces::bPawn)) -= enpassantPos.returnBitboard();
-        }
-        else
-        {
-            PiecePos enpassantPos {next.rank + 1, next.file};
-            pieces.at(static_cast<size_t>(Pieces::wPawn)) -= enpassantPos.returnBitboard();
-        }
-    } 
 
-    // else reset enpassantSquare;
-    if (!enpassantChanged)
-    {
-        enpassantSquare = 0;
-        enpassantChanged = true;
-    }
-    
     // castling rights
     switch (static_cast<Pieces>(indexCurr))
     {
@@ -605,6 +1057,14 @@ bool Position::movePiece(PiecePos curr, PiecePos next)
         }
     }
 
+    
+    // if not changed the enpassantsquare then reset enpassantSquare;
+    if (!enpassantChanged)
+    {
+        enpassantSquare = 0;
+        enpassantChanged = true;
+    }
+
     // now the opposite side moves
     if (whiteOnMove)
     {
@@ -614,15 +1074,30 @@ bool Position::movePiece(PiecePos curr, PiecePos next)
     {
         whiteOnMove = true;
     }
-
+    
     return true;
 }
 
+// returns an index of array where the piece is, if not found returns 12
+size_t findPiece(bitboard piece, const std::array<bitboard, 12>* pieces)
+{
+    if (binaryHammingWeight(piece) != 1)
+    {
+        std::cerr << "findPiece() has bHW over 1\n";
+        return INT_MAX;
+    }
 
-// Position::Position(std::string FEN)
-// {
-//     setPosition(FEN);
-// }
+    size_t index {0};
+    for (;index < 12; index++)
+    {
+        if (pieces->at(index) & piece)
+        {
+            return index;
+        }
+    }
+
+    return index;
+}
 
 
 size_t binaryHammingWeight(bitboard in) // by Peter Wegner (1960)

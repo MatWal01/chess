@@ -9,7 +9,7 @@
 int main()
 {
     GameGraphics graphics;
-    Position curr;          // turn this into a pointer in the future
+    Position curr;          // turn this into a doubly linked list in the future
                             // "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     Interface ui;
 
@@ -31,7 +31,6 @@ int main()
             if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
             {
                 ui.resetPicked(&graphics);
-                std::cout << curr.returnFEN() << std::endl;
             }
 
             if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
