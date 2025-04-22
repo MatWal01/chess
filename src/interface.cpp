@@ -3,53 +3,6 @@
 #include "gameLogic.h"
 
 
-void GameGraphics::drawPosition(sf::RenderWindow* const window, Position* const pos)
-{
-    window->draw(chessboard);
-    window->draw(picked);
-
-    bitboard temp {1};
-    sf::Sprite* tempDraw;
-
-    // for all pieces white and black
-    for (size_t index {0}; index < 12; index++)
-    {
-        tempDraw = shareSprite(index);
-        // for all squares
-        for (size_t i {0}; i < 64; i++)
-        {
-            // if piece is at given square
-            if (pos->pieces.at(index) & (temp << i))
-            {
-                tempDraw->setPosition(pieceSize * (i % 8), pieceSize * (7 - (i / 8)));
-                window->draw(*tempDraw);
-            }
-        }
-    }
-}
-
-
-void GameGraphics::drawLegalMoves(sf::RenderWindow* const window, Interface* const ui)
-{
-    if (!(ui->legalMoves))
-    {
-        return;
-    }
-
-    // white side
-    bitboard temp {1};
-    for (size_t i {0}; i < 64; i++, temp <<= 1)
-    {
-        if (ui->legalMoves & temp)
-        {
-            legalMove.setPosition((i % 8) * pieceSize + circleOffset, (7 - (i / 8)) * pieceSize + circleOffset);
-            window->draw(legalMove);
-        }
-    }
-
-}
-
-
 sf::Sprite GameGraphics::returnSprite(size_t temp)
 {
     return piecesSprites.at(temp);
@@ -164,18 +117,71 @@ GameGraphics::GameGraphics()
     return;
 }
 
+void Interface::drawPosition(sf::RenderWindow* const window, Position* const pos)
+{
+    window->draw(g.chessboard);
+    window->draw(g.picked);
 
-void Interface::leftMouseInteract(sf::RenderWindow* const window, Position* const curr, GameGraphics* const g)
+    bitboard temp {1};
+    sf::Sprite* tempDraw;
+
+    // for all pieces white and black
+    for (size_t index {0}; index < 12; index++)
+    {
+        tempDraw = g.shareSprite(index);
+        // for all squares
+        for (size_t i {0}; i < 64; i++)
+        {
+            // if piece is at given square
+            if (pos->pieces.at(index) & (temp << i))
+            {
+                tempDraw->setPosition(g.pieceSize * (i % 8), g.pieceSize * (7 - (i / 8)));
+                window->draw(*tempDraw);
+            }
+        }
+    }
+
+    drawLegalMoves(window);
+
+    if (pos->end)
+    {
+        window->draw(g.checkmate);
+    }
+}
+
+
+void Interface::drawLegalMoves(sf::RenderWindow* const window)
+{
+    if (!legalMoves)
+    {
+        return;
+    }
+
+    // white side
+    bitboard temp {1};
+    for (size_t i {0}; i < 64; i++, temp <<= 1)
+    {
+        if (legalMoves & temp)
+        {
+            g.legalMove.setPosition((i % 8) * g.pieceSize + g.circleOffset, (7 - (i / 8)) * g.pieceSize + g.circleOffset);
+            window->draw(g.legalMove);
+        }
+    }
+
+}
+
+
+void Interface::leftMouseInteract(sf::RenderWindow* const window, Position* const curr)
 {
     mouseF = window->mapPixelToCoords(mouse);
-    if (g->board.contains(mouseF))
+    if (g.board.contains(mouseF))
     {
         if (firstClick == false)
         {
             firstClick = true;
             firstPos.file = mouse.x / 100.f;
             firstPos.rank = 7 - mouse.y / 100.f + 1;
-            g->picked.setPosition(firstPos.file * g->pieceSize, (7 - firstPos.rank) * g->pieceSize);
+            g.picked.setPosition(firstPos.file * g.pieceSize, (7 - firstPos.rank) * g.pieceSize);
             getLegalMoves(curr);
         }
         else if(secondClick == false)
@@ -200,9 +206,9 @@ void Interface::leftMouseInteract(sf::RenderWindow* const window, Position* cons
         {
             firstPos.file = mouse.x / 100.f;
             firstPos.rank = 7 - mouse.y / 100.f + 1;
-            g->picked.setPosition(firstPos.file * g->pieceSize, (7 - firstPos.rank) * g->pieceSize);
+            g.picked.setPosition(firstPos.file * g.pieceSize, (7 - firstPos.rank) * g.pieceSize);
         }
-        g->picked.setPosition({g->chessboardSize, g->chessboardSize});
+        g.picked.setPosition({g.chessboardSize, g.chessboardSize});
         resetLegalMoves();
     }
 }
@@ -220,10 +226,10 @@ void Interface::resetLegalMoves()
 }
 
 
-void Interface::resetPicked(GameGraphics* const g)
+void Interface::resetPicked()
 {
     firstClick = false;
     secondClick = false;
-    g->picked.setPosition(g->chessboardSize, g->chessboardSize);
+    g.picked.setPosition(g.chessboardSize, g.chessboardSize);
     resetLegalMoves();
 }
