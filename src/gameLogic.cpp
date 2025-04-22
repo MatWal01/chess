@@ -838,6 +838,35 @@ std::tuple<bitboard, bitboard> Position::makeMove(bitboard movedPiece, bitboard 
         } 
     }
 
+    // castle
+    // rook is already taken so I dont have to subtract it
+    if (whiteOnMove)
+    {
+        if (movedPiece & WKING && takenPiece & WQUEENSIDEROOK)
+        {
+            pieces.at(static_cast<size_t>(Pieces::wKing)) = WQUEENSIDEKINGMOVE;
+            pieces.at(static_cast<size_t>(Pieces::wRook)) += WQUEENSIDEROOKMOVE;
+        }
+        else if (movedPiece & WKING && takenPiece & WKINGSIDEROOK)
+        {
+            pieces.at(static_cast<size_t>(Pieces::wKing)) = WKINGSIDEKINGMOVE;
+            pieces.at(static_cast<size_t>(Pieces::wRook)) += WKINGSIDEROOKMOVE;
+        }
+    }
+    else
+    {
+        if (movedPiece & BKING && takenPiece & BQUEENSIDEROOK)
+        {
+            pieces.at(static_cast<size_t>(Pieces::bKing)) = BQUEENSIDEKINGMOVE;
+            pieces.at(static_cast<size_t>(Pieces::bRook)) += BQUEENSIDEROOKMOVE;
+        }
+        else if (movedPiece & BKING && takenPiece & BKINGSIDEROOK)
+        {
+            pieces.at(static_cast<size_t>(Pieces::bKing)) = BKINGSIDEKINGMOVE;
+            pieces.at(static_cast<size_t>(Pieces::bRook)) += BKINGSIDEROOKMOVE;
+        }
+    }
+
     return {pastMoved, pastTaken};
 }
 
@@ -950,34 +979,6 @@ bool Position::movePiece(PiecePos curr, PiecePos next)
     // move piece (including enpassant)
     std::tuple<bitboard, bitboard> past = makeMove(currPiece, nextPiece, indexCurr, indexNext);
 
-    // castle
-    // rook is already taken so I dont have to subtract it
-    if (whiteOnMove)
-    {
-        if (currPiece & WKING && nextPiece & WQUEENSIDEROOK)
-        {
-            pieces.at(static_cast<size_t>(Pieces::wKing)) = WQUEENSIDEKINGMOVE;
-            pieces.at(static_cast<size_t>(Pieces::wRook)) += WQUEENSIDEROOKMOVE;
-        }
-        else if (currPiece & WKING && nextPiece & WKINGSIDEROOK)
-        {
-            pieces.at(static_cast<size_t>(Pieces::wKing)) = WKINGSIDEKINGMOVE;
-            pieces.at(static_cast<size_t>(Pieces::wRook)) += WKINGSIDEROOKMOVE;
-        }
-    }
-    else
-    {
-        if (currPiece & BKING && nextPiece & BQUEENSIDEROOK)
-        {
-            pieces.at(static_cast<size_t>(Pieces::bKing)) = BQUEENSIDEKINGMOVE;
-            pieces.at(static_cast<size_t>(Pieces::bRook)) += BQUEENSIDEROOKMOVE;
-        }
-        else if (currPiece & BKING && nextPiece & BKINGSIDEROOK)
-        {
-            pieces.at(static_cast<size_t>(Pieces::bKing)) = BKINGSIDEKINGMOVE;
-            pieces.at(static_cast<size_t>(Pieces::bRook)) += BKINGSIDEROOKMOVE;
-        }
-    }
 
     // // TODO: if inCheck() then unmakeMove and return false
     // if (isInCheck())
