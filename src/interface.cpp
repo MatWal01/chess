@@ -152,7 +152,7 @@ void Interface::drawPosition(sf::RenderWindow* const window, Position* const pos
 
 void Interface::drawLegalMoves(sf::RenderWindow* const window)
 {
-    if (!legalMoves)
+    if (!legalPieceMoves)
     {
         return;
     }
@@ -161,13 +161,12 @@ void Interface::drawLegalMoves(sf::RenderWindow* const window)
     bitboard temp {1};
     for (size_t i {0}; i < 64; i++, temp <<= 1)
     {
-        if (legalMoves & temp)
+        if (legalPieceMoves & temp)
         {
             g.legalMove.setPosition((i % 8) * g.pieceSize + g.circleOffset, (7 - (i / 8)) * g.pieceSize + g.circleOffset);
             window->draw(g.legalMove);
         }
     }
-
 }
 
 
@@ -216,13 +215,13 @@ void Interface::leftMouseInteract(sf::RenderWindow* const window, Position* cons
 
 void Interface::getLegalMoves(Position* const pos)
 {
-    legalMoves = pos->legalMoves(firstPos);
+    legalPieceMoves = pos->legalMoves(firstPos);
 }
 
 
 void Interface::resetLegalMoves()
 {
-    legalMoves = 0;
+    legalPieceMoves = 0;
 }
 
 

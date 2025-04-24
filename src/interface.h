@@ -4,8 +4,8 @@
 #include <string>
 
 #include <SFML/Graphics.hpp>
+#include "piecePos.h"
 #include "gameLogic.h"
-
 
 class GameGraphics
 {
@@ -15,7 +15,7 @@ private:
     // textures
     std::array<sf::Texture, 12> piecesTextures;
 
-public:    
+public:
     // sprites
     sf::Sprite chessboard;
     std::array<sf::Sprite, 12> piecesSprites;
@@ -55,7 +55,7 @@ private:
     PiecePos secondPos {0, 0};
 public:
     GameGraphics g;
-    bitboard legalMoves {0};
+    bitboard legalPieceMoves {0};
     sf::Vector2i mouse;
 
     void drawPosition(sf::RenderWindow* const window, Position* const pos);
