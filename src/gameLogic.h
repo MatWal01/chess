@@ -6,11 +6,14 @@
 #include <cstdint>
 #include <tuple>
 #include <SFML/Graphics.hpp>
+
 #include "const.h"
+#include "piecePos.h"
 
 // boolean representation of a chessboard (1 - piece is present, 0 - is not)
 // 2^0 is A1 square 2^63 is H8 square
 typedef std::uint64_t bitboard;
+class Interface;
 
 enum class Pieces
 {
@@ -26,17 +29,6 @@ enum class Pieces
     bBishop,
     bQueen,
     bKing
-};
-
-class PiecePos
-{
-public:
-    int rank; // 1, ... (1st rank is 0)
-    int file; // A, ...
-
-    bitboard returnBitboard();
-    bool isInBoardBounds();
-    friend bool operator== (const PiecePos i, const PiecePos j);
 };
 
 class Position
@@ -74,7 +66,7 @@ public:
 
 private:
     bool areLegalMovesLeft();
-    bool isInCheck(PiecePos curr);
+    bitboard isInCheck(PiecePos curr);
 
     bitboard activity();
     bitboard threats();
@@ -91,20 +83,24 @@ private:
     bitboard legalQueenMoves(PiecePos curr);
     bitboard legalKingMoves(PiecePos curr);
     bitboard legalCastle(PiecePos curr);
+    void handleCastlingRights(PiecePos curr, size_t movedIndex);
     
     std::tuple<bitboard, bitboard> makeMove(bitboard movedPiece, bitboard takenPiece, size_t movedIndex, size_t takenIndex);
     void unmakeMove(std::tuple<bitboard, bitboard> past, size_t movedIndex, size_t takenIndex);
 public:
-    bool isInCheck();
+    bitboard isInCheck();
+    // returns whiteOnMove
+    bool indexToSide(size_t index);
     bitboard pseudoLegalMoves(PiecePos curr);
+    // return actually legal moves, resource intensive (?)
     bitboard legalMoves(PiecePos curr);
     bool movePiece(PiecePos curr, PiecePos next);
+    size_t findPiece(bitboard piece);
 
     // Position();
     // Position(const Position* prev, PiecePos curr, PiecePos next);
 };
 
 // returns an index of a piece in array
-size_t findPiece(bitboard piece, const std::array<bitboard, 12>* pieces);
 size_t binaryHammingWeight(bitboard in);
 PiecePos bitboardToPiecePos(bitboard piece);
